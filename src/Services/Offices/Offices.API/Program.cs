@@ -1,6 +1,9 @@
+using FluentValidation;
+using Offices.Contracts.DTOs;
 using Offices.Domain.Interfaces;
 using Offices.Infrastructure;
 using Offices.Infrastructure.Repositories;
+using Offices.Presentation.Validators;
 using Offices.Services.Abstractions;
 using Offices.Services.Services;
 using Serilog;
@@ -33,12 +36,13 @@ app.Run();
 
 void ConfigureServices(IServiceCollection services)
 {
-    builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("MongoDatabase"));
-    builder.Services.AddScoped<IOfficesRepository, OfficesRepository>();
-    builder.Services.AddScoped<IOfficesService, OfficesService>();
-    builder.Services.AddAutoMapper(typeof(MapperProfile));
-    builder.Services.AddControllers()
+    services.AddScoped<IValidator<OfficeCreateDTO>, OfficeValidator>();
+    services.Configure<DatabaseSettings>(builder.Configuration.GetSection("MongoDatabase"));
+    services.AddScoped<IOfficesRepository, OfficesRepository>();
+    services.AddScoped<IOfficesService, OfficesService>();
+    services.AddAutoMapper(typeof(MapperProfile));
+    services.AddControllers()
     .AddApplicationPart(typeof(Offices.Presentation.Controllers.OfficesController).Assembly);
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    services.AddEndpointsApiExplorer();
+    services.AddSwaggerGen();
 }

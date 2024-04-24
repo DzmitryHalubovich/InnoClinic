@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Offices.Contracts.DTOs;
 using Offices.Services.Abstractions;
@@ -21,6 +22,7 @@ public class OfficesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllOffices()
     {
+
         var offices = await _officesService.GetAllOfficesAsync();
 
         if (offices is null || !offices.Any())
@@ -31,9 +33,17 @@ public class OfficesController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> AddOffice([FromBody] OfficeCreateDTO newOffice)
+    public async Task<IActionResult> AddOffice(IValidator<OfficeCreateDTO> validator,
+        [FromBody] OfficeCreateDTO newOffice)
     {
-        await _officesService.AddNewOfficeAsync(newOffice);
-        return Ok(newOffice);
+        var validationResult = validator.Validate(newOffice);
+        
+        if (validationResult.IsValid)
+        {
+            await _officesService.AddNewOfficeAsync(newOffice);
+            return Ok(newOffice);
+        }
+
+        return BadRequest(validationResult.ToDictionary());
     }
 }
