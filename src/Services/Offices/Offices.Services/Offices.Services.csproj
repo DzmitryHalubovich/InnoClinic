@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Offices.Domain\Offices.Domain.csproj" />
     <ProjectReference Include="..\Offices.Infrastructure\Offices.Infrastructure.csproj" />
     <ProjectReference Include="..\Offices.Services.Abstractions\Offices.Services.Abstractions.csproj" />
   </ItemGroup>

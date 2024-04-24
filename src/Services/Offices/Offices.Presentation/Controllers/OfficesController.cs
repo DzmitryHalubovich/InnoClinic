@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Offices.Contracts.DTOs;
 using Offices.Services.Abstractions;
 
 namespace Offices.Presentation.Controllers;
@@ -25,6 +26,14 @@ public class OfficesController : ControllerBase
         if (offices is null || !offices.Any())
             return NotFound();
 
-        return Ok(offices);
+        return Ok();
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddOffice([FromBody] OfficeCreateDTO newOffice)
+    {
+        await _officesService.AddNewOfficeAsync(newOffice);
+        return Ok(newOffice);
     }
 }

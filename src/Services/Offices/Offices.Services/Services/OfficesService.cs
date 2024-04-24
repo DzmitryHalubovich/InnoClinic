@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Offices.Contracts.DTOs;
+using Offices.Domain.Entities;
 using Offices.Domain.Interfaces;
 using Offices.Services.Abstractions;
 
@@ -14,6 +15,13 @@ public class OfficesService : IOfficesService
     {
         _officesRepository = officesRepository;
         _mapper = mapper;
+    }
+
+    public async Task AddNewOfficeAsync(OfficeCreateDTO newOffice)
+    {
+        var mappedOffice = _mapper.Map<Office>(newOffice);
+
+        await _officesRepository.AddNewAsync(mappedOffice);
     }
 
     public async Task<List<OfficeResponseDTO>> GetAllOfficesAsync()

@@ -3,8 +3,17 @@ using Offices.Infrastructure;
 using Offices.Infrastructure.Repositories;
 using Offices.Services.Abstractions;
 using Offices.Services.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 ConfigureServices(builder.Services);
 
