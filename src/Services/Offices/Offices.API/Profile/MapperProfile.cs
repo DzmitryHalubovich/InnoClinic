@@ -8,5 +8,6 @@ public class MapperProfile : Profile
     {
         CreateMap<Office, OfficeResponseDTO>();
         CreateMap<OfficeCreateDTO, Office>();
+        CreateMap<OfficeUpdateDTO, Office>();
     }
 }

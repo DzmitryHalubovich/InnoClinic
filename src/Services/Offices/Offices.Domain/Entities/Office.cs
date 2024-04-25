@@ -9,6 +9,7 @@ public class Office
     public string Id { get; set; }
 
     [BsonElement("address")]
+    [BsonRepresentation(MongoDB.Bson.BsonType.String)]
     public string Address { get; set; }
 
     [BsonElement("photo_id")]

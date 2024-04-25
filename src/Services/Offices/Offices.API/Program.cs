@@ -1,4 +1,6 @@
 using FluentValidation;
+using Newtonsoft.Json;
+using Offices.API.Extensions;
 using Offices.Contracts.DTOs;
 using Offices.Domain.Interfaces;
 using Offices.Infrastructure;
@@ -10,17 +12,27 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var logger = new LoggerConfiguration()
+Log.Logger = new LoggerConfiguration()
+    .Destructure.ByTransforming<OfficeResponseDTO>(offices => JsonConvert.SerializeObject(offices))
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateLogger();
+
+var serilogLogger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .CreateLogger();
 
 builder.Logging.ClearProviders();
-builder.Logging.AddSerilog(logger);
+
+builder.Logging.AddSerilog(serilogLogger);
 
 ConfigureServices(builder.Services);
 
 var app = builder.Build();
+
+var logger = app.Services.GetRequiredService<Serilog.ILogger>();
+app.ConfigureExceptionHandler(logger);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
