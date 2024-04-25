@@ -9,14 +9,13 @@ public class Office
     public string Id { get; set; }
 
     [BsonElement("address")]
-    [BsonRepresentation(MongoDB.Bson.BsonType.String)]
-    public string Address { get; set; }
+    public string Address { get; set; } = null!;
 
     [BsonElement("photo_id")]
-    public string Photo_Id { get; set; }
+    public string? Photo_Id { get; set; }
 
     [BsonElement("registry_phone_number")]
-    public string Registry_phone_number { get; set; }
+    public string Registry_phone_number { get; set; } = null!;
 
     [BsonElement("isActive")]
     public bool IsActive { get; set; }

@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Offices.Contracts.DTOs;
 using Offices.Services.Abstractions;
-using Serilog;
 
 namespace Offices.Presentation.Controllers;
 
@@ -13,12 +11,10 @@ namespace Offices.Presentation.Controllers;
 public class OfficesController : ControllerBase
 {
     private readonly IOfficesService _officesService;
-    private readonly ILogger<OfficesController> _logger;
 
-    public OfficesController(IOfficesService officesService, ILogger<OfficesController> logger)
+    public OfficesController(IOfficesService officesService)
     {
         _officesService = officesService;
-        _logger = logger;
     }
 
     [HttpGet]
@@ -26,12 +22,7 @@ public class OfficesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllOffices()
     {
-        _logger.LogInformation("We are in GetAllOffices method");
-
         var offices = await _officesService.GetAllOfficesAsync();
-
-        Log.Information("Response include {@count} entities.",offices.Count);
-        Log.Information("Response: {@Offices}", offices);
 
         if (offices is null || !offices.Any())
             return NotFound();
@@ -75,10 +66,17 @@ public class OfficesController : ControllerBase
     }
 
     [HttpPut("{officeId}")]
-    public async Task<IActionResult> UpdateOffice([FromBody] OfficeUpdateDTO editedOffice, [FromRoute] string officeId)
+    public async Task<IActionResult> UpdateOffice(IValidator<OfficeUpdateDTO> validator,
+        [FromBody] OfficeUpdateDTO editedOffice, [FromRoute] string officeId)
     {
-        await _officesService.UpdateOfficeAsync(officeId, editedOffice);
+        var validationResult = validator.Validate(editedOffice);
 
-        return NoContent();
+        if (validationResult.IsValid)
+        {
+            await _officesService.UpdateOfficeAsync(officeId, editedOffice);
+            return NoContent();
+        }
+
+        return BadRequest(validationResult.ToDictionary());
     }
 }

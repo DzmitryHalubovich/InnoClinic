@@ -5,13 +5,14 @@ using System.Text.RegularExpressions;
 
 namespace Offices.Presentation.Validators;
 
-public class OfficeValidator : AbstractValidator<OfficeCreateDTO>
+public class OfficeUpdateValidator : AbstractValidator<OfficeUpdateDTO>
 {
-    public OfficeValidator()
+    public OfficeUpdateValidator()
     {
         RuleFor(x => x.IsActive).NotEmpty();
-        RuleFor(x => x.Photo_Id).NotEmpty();
-        RuleFor(x => x.Address).NotEmpty()
+        RuleFor(x => x.Address)
+            .NotEmpty().WithMessage("Field Address is empty.")
+            .MaximumLength(500).WithMessage("Address fiel is too long.")
             .Custom((name, context) =>
             {
                 Regex rg = new Regex("<.*?>"); // Matches HTML tags
@@ -27,7 +28,8 @@ public class OfficeValidator : AbstractValidator<OfficeCreateDTO>
             });
         RuleFor(x => x.Registry_phone_number)
             .Matches("^[\\+]?[(]?[0-9]{3}[)]?[-\\s\\.]?[0-9]{3}[-\\s\\.]?[0-9]{4,6}$")
-            .NotEmpty()
+            .WithMessage("Wrong phone format.")
+            .NotEmpty().WithMessage("Registry phone number is empty.")
             .Custom((name, context) =>
             {
                 Regex rg = new Regex("<.*?>"); // Matches HTML tags

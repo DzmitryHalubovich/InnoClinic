@@ -1,5 +1,4 @@
 using FluentValidation;
-using Newtonsoft.Json;
 using Offices.API.Extensions;
 using Offices.Contracts.DTOs;
 using Offices.Domain.Interfaces;
@@ -12,20 +11,11 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Log.Logger = new LoggerConfiguration()
-    .Destructure.ByTransforming<OfficeResponseDTO>(offices => JsonConvert.SerializeObject(offices))
-    .MinimumLevel.Debug()
-    .WriteTo.Console()
-    .CreateLogger();
-
-var serilogLogger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .CreateLogger();
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.WriteTo.Console()
+    .ReadFrom.Configuration(ctx.Configuration));
 
 builder.Logging.ClearProviders();
-
-builder.Logging.AddSerilog(serilogLogger);
 
 ConfigureServices(builder.Services);
 
@@ -48,10 +38,11 @@ app.Run();
 
 void ConfigureServices(IServiceCollection services)
 {
-    services.AddScoped<IValidator<OfficeCreateDTO>, OfficeValidator>();
-    services.Configure<DatabaseSettings>(builder.Configuration.GetSection("MongoDatabase"));
+    services.AddScoped<IValidator<OfficeCreateDTO>, OfficeCreateValidator>();
+    services.AddScoped<IValidator<OfficeUpdateDTO>, OfficeUpdateValidator>();
     services.AddScoped<IOfficesRepository, OfficesRepository>();
     services.AddScoped<IOfficesService, OfficesService>();
+    services.Configure<DatabaseSettings>(builder.Configuration.GetSection("MongoDatabase"));
     services.AddAutoMapper(typeof(MapperProfile));
     services.AddControllers()
     .AddApplicationPart(typeof(Offices.Presentation.Controllers.OfficesController).Assembly);
