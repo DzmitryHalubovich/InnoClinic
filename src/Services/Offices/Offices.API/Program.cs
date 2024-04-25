@@ -47,5 +47,15 @@ void ConfigureServices(IServiceCollection services)
     services.AddControllers()
     .AddApplicationPart(typeof(Offices.Presentation.Controllers.OfficesController).Assembly);
     services.AddEndpointsApiExplorer();
-    services.AddSwaggerGen();
+    services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo()
+        {
+            Title = "OfficeAPI",
+            Version = "v1"
+        });
+        // using System.Reflection;
+        var xmlFilename = Path.Combine(AppContext.BaseDirectory, "Offices.Presentation.xml");
+        options.IncludeXmlComments(xmlFilename);
+    });
 }

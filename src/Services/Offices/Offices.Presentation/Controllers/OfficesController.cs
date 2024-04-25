@@ -17,7 +17,12 @@ public class OfficesController : ControllerBase
         _officesService = officesService;
     }
 
+    /// <summary>
+    /// Returns list of offices
+    /// </summary>
+    /// <returns>Some result</returns>
     [HttpGet]
+    [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllOffices()
@@ -30,7 +35,29 @@ public class OfficesController : ControllerBase
         return Ok(offices);
     }
 
+
+    /// <summary>
+    /// Returns office by id
+    /// </summary>
+    /// <param name="officeId"></param>
+    /// <remarks>
+    /// Sample request:
+    /// 
+    ///     GET /GetOfficeById
+    ///     {
+    ///         "id": "6628bfbfb2cf06aabe117b7d",
+    ///         "address": "Some address",
+    ///         "photo_Id": "6628bfbfb2cf06aabe117b7d",
+    ///         "registry_phone_number": "+123456785894",
+    ///         "isActive": true
+    ///     }
+    /// 
+    /// </remarks>
+    /// <returns>Office with requested id</returns>
+    /// <response code="200">Returns office successfully</response>
+    /// <response code="404">If office with requested id doesn't exist in the database</response>
     [HttpGet("{officeId}")]
+    [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOfficeById([FromRoute] string officeId)
@@ -41,6 +68,7 @@ public class OfficesController : ControllerBase
     }
 
     [HttpPost]
+    [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddOffice(IValidator<OfficeCreateDTO> validator,
@@ -58,6 +86,7 @@ public class OfficesController : ControllerBase
     }
 
     [HttpDelete("{officeId}")]
+    [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteOffice([FromRoute] string officeId)
     {
@@ -66,6 +95,7 @@ public class OfficesController : ControllerBase
     }
 
     [HttpPut("{officeId}")]
+    [Produces("application/json")]
     public async Task<IActionResult> UpdateOffice(IValidator<OfficeUpdateDTO> validator,
         [FromBody] OfficeUpdateDTO editedOffice, [FromRoute] string officeId)
     {
