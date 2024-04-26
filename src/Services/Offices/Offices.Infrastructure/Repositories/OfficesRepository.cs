@@ -30,5 +30,5 @@ public class OfficesRepository : IOfficesRepository
         await _officesCollection.DeleteOneAsync(o => o.Id.Equals(officeId));
 
     public async Task UpdateAsync(string officeId, Office newOffice) =>
-        await _officesCollection.ReplaceOneAsync(b => b.Id == officeId, newOffice);
+        await _officesCollection.ReplaceOneAsync(o => o.Id == officeId, newOffice);
 }

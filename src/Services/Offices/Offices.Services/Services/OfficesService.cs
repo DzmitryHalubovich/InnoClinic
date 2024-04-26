@@ -52,14 +52,14 @@ public class OfficesService : IOfficesService
 
     public async Task DeleteOfficeAsync(string officeId)
     {
-        await ThrowExceptionIfOfficeDoesntExistsInDatabase(officeId);
+        await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);
 
         await _officesRepository.DeleteAsync(officeId);
     }
 
     public async Task UpdateOfficeAsync(string officeId, OfficeUpdateDTO editedOffice)
     {
-        await ThrowExceptionIfOfficeDoesntExistsInDatabase(officeId);
+        await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);
 
         var office = _mapper.Map<Office>(editedOffice);
 
@@ -69,7 +69,7 @@ public class OfficesService : IOfficesService
     }
 
 
-    private async Task ThrowExceptionIfOfficeDoesntExistsInDatabase(string officeId)
+    private async Task ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(string officeId)
     {
         var doesOfficeExists = await _officesRepository.GetByIdAsync(officeId) is not null;
 

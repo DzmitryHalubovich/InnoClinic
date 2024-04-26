@@ -54,7 +54,7 @@ void ConfigureServices(IServiceCollection services)
             Title = "OfficeAPI",
             Version = "v1"
         });
-        // using System.Reflection;
+
         var xmlFilename = Path.Combine(AppContext.BaseDirectory, "Offices.Presentation.xml");
         options.IncludeXmlComments(xmlFilename);
     });
