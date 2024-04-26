@@ -11,11 +11,11 @@ public class Office
     [BsonElement("address")]
     public string Address { get; set; } = null!;
 
-    [BsonElement("photo_id")]
-    public string? Photo_Id { get; set; }
+    [BsonElement("photoId")]
+    public string? PhotoId { get; set; }
 
-    [BsonElement("registry_phone_number")]
-    public string Registry_phone_number { get; set; } = null!;
+    [BsonElement("registryPhoneNumber")]
+    public string RegistryPhoneNumber { get; set; } = null!;
 
     [BsonElement("isActive")]
     public bool IsActive { get; set; }

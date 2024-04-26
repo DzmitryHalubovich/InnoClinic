@@ -39,11 +39,15 @@ public class OfficesService : IOfficesService
         return mappedOffice;
     }
 
-    public async Task AddNewOfficeAsync(OfficeCreateDTO newOffice)
+    public async Task<OfficeResponseDTO> AddNewOfficeAsync(OfficeCreateDTO newOffice)
     {
         var mappedOffice = _mapper.Map<Office>(newOffice);
 
         await _officesRepository.AddNewAsync(mappedOffice);
+
+        var createdOffice = _mapper.Map<OfficeResponseDTO>(mappedOffice);
+
+        return createdOffice;
     }
 
     public async Task DeleteOfficeAsync(string officeId)
