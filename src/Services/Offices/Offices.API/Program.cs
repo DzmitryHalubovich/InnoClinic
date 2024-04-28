@@ -1,8 +1,9 @@
 using FluentValidation;
+using MongoDB.Driver;
 using Offices.API.Extensions;
 using Offices.Contracts.DTOs;
+using Offices.Domain.Entities;
 using Offices.Domain.Interfaces;
-using Offices.Infrastructure;
 using Offices.Infrastructure.Repositories;
 using Offices.Presentation.Validators;
 using Offices.Services.Abstractions;
@@ -10,6 +11,7 @@ using Offices.Services.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 builder.Host.UseSerilog((ctx, lc) =>
     lc.WriteTo.Console()
@@ -38,11 +40,22 @@ app.Run();
 
 void ConfigureServices(IServiceCollection services)
 {
+    services.AddSingleton<IMongoClient>(sp =>
+    {
+        var connectionString = builder.Configuration["MongoDatabase:ConnectionString"];
+        return new MongoClient(connectionString);
+    });
+    services.AddScoped(sp =>
+    {
+        var client = sp.GetRequiredService<IMongoClient>();
+        var database = builder.Configuration["MongoDatabase:DatabaseName"];
+        return client.GetDatabase(database)
+            .GetCollection<Office>(builder.Configuration["MongoDatabase:OfficesCollectionName"]);
+    });
     services.AddScoped<IValidator<OfficeCreateDTO>, OfficeCreateValidator>();
     services.AddScoped<IValidator<OfficeUpdateDTO>, OfficeUpdateValidator>();
     services.AddScoped<IOfficesRepository, OfficesRepository>();
     services.AddScoped<IOfficesService, OfficesService>();
-    services.Configure<DatabaseSettings>(builder.Configuration.GetSection("MongoDatabase"));
     services.AddAutoMapper(typeof(MapperProfile));
     services.AddControllers()
     .AddApplicationPart(typeof(Offices.Presentation.Controllers.OfficesController).Assembly);

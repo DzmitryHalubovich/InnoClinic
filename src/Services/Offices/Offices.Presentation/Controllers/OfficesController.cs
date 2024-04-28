@@ -57,15 +57,15 @@ public class OfficesController : ControllerBase
     {
         var offices = await _officesService.GetAllOfficesAsync();
 
-        if (offices is null || !offices.Any())
-            return NotFound();
+        if (offices.Any())
+            return Ok(offices);
 
-        return Ok(offices);
+        return NotFound();
     }
 
 
     /// <summary>
-    /// Returns office the specified id
+    /// Returns office by the specified id
     /// </summary>
     /// <param name="officeId">Spesified id of the office in the database</param>
     /// <remarks>

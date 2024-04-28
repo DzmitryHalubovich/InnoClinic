@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using Offices.Domain.Entities;
 using Offices.Domain.Interfaces;
 
@@ -9,12 +8,9 @@ public class OfficesRepository : IOfficesRepository
 {
     private readonly IMongoCollection<Office> _officesCollection;
 
-    public OfficesRepository(IOptions<DatabaseSettings> databaseSettings)
+    public OfficesRepository(IMongoCollection<Office> officesCollection)
     {
-        var mongoClient = new MongoClient(databaseSettings.Value.ConnectionString);
-
-        var mongoDb = mongoClient.GetDatabase(databaseSettings.Value.DatabaseName);
-        _officesCollection = mongoDb.GetCollection<Office>(databaseSettings.Value.CollectionName);
+        _officesCollection = officesCollection;
     }
 
     public async Task<List<Office>> GetAllAsync() => 
