@@ -13,7 +13,6 @@ public class OfficesRepository : IOfficesRepository
         _officesCollection = officesCollection;
     }
 
-
     public async Task<List<Office>> GetAllAsync() => 
         await _officesCollection.Find(_ => true).ToListAsync();
 

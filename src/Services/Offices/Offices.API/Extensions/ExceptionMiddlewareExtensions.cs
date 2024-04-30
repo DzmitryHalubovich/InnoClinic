@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Offices.Domain.ErrorModel;
 using Offices.Domain.Exceptions;
-using System.Net;
 
 namespace Offices.API.Extensions;
 
@@ -16,6 +15,7 @@ public static class ExceptionMiddlewareExtensions
                 context.Response.ContentType = "application/json";
 
                 var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+
                 if (contextFeature is not null)
                 {
                     context.Response.StatusCode = contextFeature.Error switch
@@ -28,7 +28,7 @@ public static class ExceptionMiddlewareExtensions
 
                     await context.Response.WriteAsync(new ErrorDetails()
                     {
-                        StatusCode = (int)HttpStatusCode.InternalServerError,
+                        StatusCode = context.Response.StatusCode,
                         Message = contextFeature.Error.Message,
                     }.ToString());
                 }

@@ -18,7 +18,6 @@ public class OfficesService : IOfficesService
         _mapper = mapper;
     }
 
-
     public async Task<List<OfficeResponseDTO>> GetAllOfficesAsync()
     {
         var offices = await _officesRepository.GetAllAsync();
