@@ -20,6 +20,7 @@ public class OfficesController : ControllerBase
         _officesService = officesService;
     }
 
+
     /// <summary>
     /// Returns list of offices
     /// </summary>
@@ -57,10 +58,12 @@ public class OfficesController : ControllerBase
     {
         var offices = await _officesService.GetAllOfficesAsync();
 
-        if (offices.Any())
-            return Ok(offices);
+        if (!offices.Any())
+        {
+            return NotFound();
+        }
 
-        return NotFound();
+        return Ok(offices);
     }
 
 
@@ -127,10 +130,11 @@ public class OfficesController : ControllerBase
         if (validationResult.IsValid)
         {
             var createdOffice = await _officesService.AddNewOfficeAsync(newOffice);
+
             return CreatedAtRoute("GetOfficeById",  new { officeId = createdOffice.Id }, createdOffice);
         }
 
-        return BadRequest(validationResult.ToDictionary());
+        return BadRequest(validationResult);
     }
 
 
@@ -156,6 +160,7 @@ public class OfficesController : ControllerBase
     public async Task<IActionResult> DeleteOfficeById([FromRoute] string officeId)
     {
         await _officesService.DeleteOfficeAsync(officeId);
+
         return NoContent();
     }
 
@@ -195,6 +200,7 @@ public class OfficesController : ControllerBase
         if (validationResult.IsValid)
         {
             await _officesService.UpdateOfficeAsync(officeId, editedOffice);
+
             return NoContent();
         }
 

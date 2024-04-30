@@ -13,7 +13,6 @@ public static class ExceptionMiddlewareExtensions
         {
             appError.Run(async context =>
             {
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
 
                 var contextFeature = context.Features.Get<IExceptionHandlerFeature>();

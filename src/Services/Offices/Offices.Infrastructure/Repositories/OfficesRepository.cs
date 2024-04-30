@@ -13,6 +13,7 @@ public class OfficesRepository : IOfficesRepository
         _officesCollection = officesCollection;
     }
 
+
     public async Task<List<Office>> GetAllAsync() => 
         await _officesCollection.Find(_ => true).ToListAsync();
 
@@ -25,6 +26,6 @@ public class OfficesRepository : IOfficesRepository
     public async Task DeleteAsync(string officeId) => 
         await _officesCollection.DeleteOneAsync(o => o.Id.Equals(officeId));
 
-    public async Task UpdateAsync(string officeId, Office newOffice) =>
-        await _officesCollection.ReplaceOneAsync(o => o.Id == officeId, newOffice);
+    public async Task UpdateAsync(string officeId, Office updatedOffice) =>
+        await _officesCollection.ReplaceOneAsync(o => o.Id == officeId, updatedOffice);
 }

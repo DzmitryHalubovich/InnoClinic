@@ -12,7 +12,6 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Host.UseSerilog((ctx, lc) =>
     lc.WriteTo.Console()
     .ReadFrom.Configuration(ctx.Configuration));
@@ -20,6 +19,8 @@ builder.Host.UseSerilog((ctx, lc) =>
 builder.Logging.ClearProviders();
 
 ConfigureServices(builder.Services);
+
+ValidatorOptions.Global.LanguageManager.Enabled = false;
 
 var app = builder.Build();
 

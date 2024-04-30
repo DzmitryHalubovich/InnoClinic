@@ -18,6 +18,7 @@ public class OfficesService : IOfficesService
         _mapper = mapper;
     }
 
+
     public async Task<List<OfficeResponseDTO>> GetAllOfficesAsync()
     {
         var offices = await _officesRepository.GetAllAsync();
@@ -29,10 +30,9 @@ public class OfficesService : IOfficesService
 
     public async Task<OfficeResponseDTO> GetOfficeByIdAsync(string officeId)
     {
-        var office = await _officesRepository.GetByIdAsync(officeId);
+        await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);
 
-        if (office is null)
-            throw new OfficeNotFoundException(officeId);
+        var office = await _officesRepository.GetByIdAsync(officeId);
 
         var mappedOffice = _mapper.Map<OfficeResponseDTO>(office);
 
@@ -57,11 +57,11 @@ public class OfficesService : IOfficesService
         await _officesRepository.DeleteAsync(officeId);
     }
 
-    public async Task UpdateOfficeAsync(string officeId, OfficeUpdateDTO editedOffice)
+    public async Task UpdateOfficeAsync(string officeId, OfficeUpdateDTO updatedOffice)
     {
         await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);
 
-        var office = _mapper.Map<Office>(editedOffice);
+        var office = _mapper.Map<Office>(updatedOffice);
 
         office.Id = officeId;
 
@@ -74,6 +74,8 @@ public class OfficesService : IOfficesService
         var doesOfficeExists = await _officesRepository.GetByIdAsync(officeId) is not null;
 
         if (!doesOfficeExists)
-            throw new OfficeNotFoundException(officeId);
+        {
+            throw new NotFoundException($"Office with id: {officeId} does't exist in the database.");
+        }
     }
 }
