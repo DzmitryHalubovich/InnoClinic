@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Profiles.Contracts.DTOs;
+using Profiles.Services.Abstractions;
 
 namespace Profiles.Presentation.Controllers;
 
@@ -7,20 +7,26 @@ namespace Profiles.Presentation.Controllers;
 [Route("api/doctors")]
 public class DoctorsController : ControllerBase
 {
-    public List<DoctorResponseDTO> Doctors =
-    [
-        new(Guid.NewGuid(), "Tom", "Jefferson",null,
-            DateTime.Now, DateTime.Now, "At work"),  
-        new(Guid.NewGuid(), "Sam", "Bridges",null,
-            DateTime.Now, DateTime.Now, "Sick Leave"),
-        new(Guid.NewGuid(), "Ivan", "Reon","Anatolievich",
-            DateTime.Now, DateTime.Now, "Inactive"),  
-    ];
+    private readonly IDoctorsService _doctorsService;
 
+    public DoctorsController(IDoctorsService doctorsService)
+    {
+        _doctorsService = doctorsService;
+    }
 
     [HttpGet]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        return Ok(Doctors);
+        var doctors = await _doctorsService.GetAllDoctorsAsync();
+
+        return Ok(doctors);
+    }
+
+    [HttpGet("{doctorId}")]
+    public async Task<IActionResult> GetById([FromRoute] Guid doctorId)
+    {
+        var doctor = await _doctorsService.GetDoctorByIdAsync(doctorId);
+
+        return Ok(doctor);
     }
 }

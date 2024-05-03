@@ -1,5 +1,12 @@
 ﻿namespace Profiles.Contracts.DTOs;
 
-public record DoctorResponseDTO(Guid DoctorId, string FirstName, string LastName, string? MiddleName,
-    DateTime DateOfBirth, DateTime CareerStartYear, string Status);
+public class DoctorResponseDTO()
+{
+    public Guid DoctorId { get; set; }
+    public string FullName { get; set; }
+    public int Experience { get; set;}
+    public string OfficeAddress { get; set; }
+    public string Status { get; set;}
+    public string Specialization {  get; set; }
+}
 

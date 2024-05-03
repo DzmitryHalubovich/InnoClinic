@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Profiles.Infrastructure\Profiles.Infrastructure.csproj" />
     <ProjectReference Include="..\Profiles.Services.Abstractions\Profiles.Services.Abstractions.csproj" />
   </ItemGroup>
