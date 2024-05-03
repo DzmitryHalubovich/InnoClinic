@@ -5,6 +5,7 @@ namespace Offices.Services.Abstractions;
 public interface IOfficesService
 {
     public Task<List<OfficeResponseDTO>> GetAllOfficesAsync();
+    public Task<List<OfficeResponseDTO>> GetOfficesByIdsAsync(IEnumerable<string> officesIds);
     public Task<OfficeResponseDTO> GetOfficeByIdAsync(string officeId);
     public Task<OfficeResponseDTO> AddNewOfficeAsync(OfficeCreateDTO newOffice);
     public Task UpdateOfficeAsync(string officeId, OfficeUpdateDTO updatedOffice);

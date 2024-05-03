@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Offices.Contracts.DTOs;
+using Offices.Presentation.ModelBinders;
 using Offices.Services.Abstractions;
 
 namespace Offices.Presentation.Controllers;
@@ -66,6 +67,52 @@ public class OfficesController : ControllerBase
         return Ok(offices);
     }
 
+    /// <summary>
+    /// Returns list of offices by the specified ids
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    /// 
+    ///     GET /GetOfficesByIds
+    ///     [
+    ///         {
+    ///             "id": "6628bfbfb2cf06aabe117b7d",
+    ///             "address": "Some address1",
+    ///             "photoId": "6628bfbfb2cf06aabe117b7d",
+    ///             "registryPhoneNumber": "+123456785894",
+    ///             "isActive": true
+    ///         },
+    ///         {
+    ///             "id": "6638bfbfb4cf06acbe118b7w",
+    ///             "address": "Some address2",
+    ///             "photoId": "6628bfbma2cf34aabe117b7d",
+    ///             "registryPhoneNumber": "+987654321214",
+    ///             "isActive": false
+    ///         },
+    ///         ...
+    ///     ]
+    /// 
+    /// </remarks>
+    /// <param name="officesIds">Ids of offices</param>
+    /// <returns></returns>
+    /// <response code="200">Returns offices successfully</response>
+    /// <response code="404">Returns if there aren't any offices in the database</response>
+    [HttpGet("collection/({officesIds})")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetOfficesByIds(
+        [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<string> officesIds)
+    {
+        var offices = await _officesService.GetOfficesByIdsAsync(officesIds);
+
+        if (!offices.Any())
+        {
+            return NotFound();
+        }
+
+        return Ok(offices);
+    }
 
     /// <summary>
     /// Returns office by the specified id

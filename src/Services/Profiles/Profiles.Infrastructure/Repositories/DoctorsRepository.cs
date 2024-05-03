@@ -15,7 +15,7 @@ public class DoctorsRepository : IDoctorsRepository
                 MiddleName = null,
                 DateOfBirth = new DateTime(1991, 06, 20),
                 CareerStartYear = new DateTime(2020, 11, 21),
-                OfficeId = "662e6f1acd5d221bc4aee8c5",
+                OfficeId = "662e681805655321ed386452",
                 Specialization = new()
                 {
                     SpecializationId = Guid.NewGuid(),

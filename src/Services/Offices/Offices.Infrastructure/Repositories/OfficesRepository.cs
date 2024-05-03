@@ -16,6 +16,9 @@ public class OfficesRepository : IOfficesRepository
     public async Task<List<Office>> GetAllAsync() => 
         await _officesCollection.Find(_ => true).ToListAsync();
 
+    public async Task<List<Office>> GetCollectionByIdsAsync(IEnumerable<string> officesId) =>
+        await _officesCollection.Find(x => officesId.Contains(x.Id)).ToListAsync();
+
     public async Task<Office> GetByIdAsync(string officeId) => 
         await _officesCollection.Find(o => o.Id.Equals(officeId)).FirstOrDefaultAsync();
 

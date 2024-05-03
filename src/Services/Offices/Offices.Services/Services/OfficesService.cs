@@ -27,6 +27,15 @@ public class OfficesService : IOfficesService
         return mappedOfficesCollection;
     }
 
+    public async Task<List<OfficeResponseDTO>> GetOfficesByIdsAsync(IEnumerable<string> officesIds)
+    {
+        var offices = await _officesRepository.GetCollectionByIdsAsync(officesIds);
+
+        var mappedOfficesCollection = _mapper.Map<List<OfficeResponseDTO>>(offices);
+
+        return mappedOfficesCollection;
+    }
+
     public async Task<OfficeResponseDTO> GetOfficeByIdAsync(string officeId)
     {
         await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);

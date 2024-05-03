@@ -2,7 +2,7 @@
 
 public class Office
 {
-    public string Id { get; set; }
+    public string OfficeId { get; set; }
 
     public string Address { get; set; } = null!;
     public string? PhotoId { get; set; }

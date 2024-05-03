@@ -25,13 +25,19 @@ public class DoctorsService : IDoctorsService
     {
         var doctors = _doctorsRepository.GetAll();
 
+        IEnumerable<string> officesIds = doctors.Select(x=>x.OfficeId).Distinct().ToList();
+
+        string stringWithOfficesIds = string.Join(',', officesIds);
+
+        var offices = await _httpClient.GetFromJsonAsync<List<Office>>($"collection/({stringWithOfficesIds})");
+
         foreach (var doctor in doctors)
         {
-            var office = await _httpClient.GetFromJsonAsync<Office>($"{doctor.OfficeId}");
-            doctor.Office = office;
+            doctor.Office = offices.FirstOrDefault(x => x.OfficeId.Equals(doctor.OfficeId));
         }
 
         var mappedDoctors = _mapper.Map<List<DoctorResponseDTO>>(doctors);
+
 
         return mappedDoctors;
     }
@@ -41,6 +47,8 @@ public class DoctorsService : IDoctorsService
         var doctor = _doctorsRepository.GetById(doctorId);
 
         doctor.Office = await _httpClient.GetFromJsonAsync<Office>($"{doctor.OfficeId}");
+
+
 
         var mappedDoctor = _mapper.Map<DoctorResponseDTO>(doctor);
 
