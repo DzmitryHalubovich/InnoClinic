@@ -3,4 +3,5 @@
 public interface IServiceManager
 {
     public IDoctorsService DoctorsService { get; }
+    public IPatientsService PatientsService { get; }
 }

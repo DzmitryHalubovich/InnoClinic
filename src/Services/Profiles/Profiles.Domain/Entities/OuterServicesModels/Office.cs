@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Profiles.Domain.Entities.OuterServicesModels;
 
+[NotMapped]
 public class Office
 {
-    [Key]
     public string OfficeId { get; set; }
     public string Address { get; set; } = null!;
     public string? PhotoId { get; set; }

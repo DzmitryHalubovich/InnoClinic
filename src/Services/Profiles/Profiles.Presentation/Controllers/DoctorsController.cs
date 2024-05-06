@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Profiles.Contracts.DTOs;
+using Profiles.Contracts.DTOs.Doctor;
 using Profiles.Presentation.Pagination;
 using Profiles.Services.Abstractions;
 
@@ -38,5 +38,11 @@ public class DoctorsController : ControllerBase
         var createdDoctor = await _doctorsService.CreateDoctorAsync(newDoctor);
 
         return Ok(createdDoctor);
+    }
+
+    [HttpPut("{doctorId}")]
+    public async Task<IActionResult> UpdateDoctor([FromRoute] Guid doctorId, [FromBody] DoctorUpdateDTO editedDotctor)
+    {
+
     }
 }

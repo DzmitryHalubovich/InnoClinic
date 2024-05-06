@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Profiles.Contracts.DTOs;
+namespace Profiles.Domain.Entities;
 
-public class AccountPersonalInfoCreateDTO
+public class PersonalInfo
 {
+    public Guid PersonalInfoId { get; set; }
     [Required]
     [MaxLength(100)]
     public string FirstName { get; set; } = null!;

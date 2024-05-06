@@ -1,4 +1,4 @@
-﻿using Profiles.Contracts.DTOs;
+﻿using Profiles.Contracts.DTOs.Doctor;
 using Profiles.Presentation.Pagination;
 
 namespace Profiles.Services.Abstractions;

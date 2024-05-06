@@ -11,11 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+builder.Services.AddScoped<IServiceManager, ServiceManager>();
 builder.Services.AddScoped<IDoctorsService, DoctorsService>();
+builder.Services.AddScoped<IPatientsService, PatientsService>();
 builder.Services.AddScoped<IDoctorsRepository, DoctorsRepository>();
 builder.Services.AddScoped<IAccountsRepository, AccountRepository>();
 builder.Services.AddScoped<IPersonalInfoRepository, PersonalInfoRepository>();
-builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
+builder.Services.AddScoped<IPatientsRepository, PatientsRepository>();
 builder.Services.AddAutoMapper(typeof(MapperProfile));
 builder.Services.AddHttpClient();
 

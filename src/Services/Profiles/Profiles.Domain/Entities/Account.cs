@@ -8,9 +8,8 @@ public class Account
     public Guid AccountId { get; set; }
 
     [Required]
-    public Guid PersonalInformationId { get; set; }
-    public PersonalInformation? PersonalInfo { get; set; }
-
+    public Guid PersonalInfoId { get; set; }
+    public PersonalInfo? PersonalInfo { get; set; }
 
     [Required]
     [EmailAddress]

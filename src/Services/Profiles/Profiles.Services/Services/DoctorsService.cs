@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
-using Profiles.Contracts.DTOs;
+using Profiles.Contracts.DTOs.Doctor;
 using Profiles.Domain.Entities;
 using Profiles.Domain.Entities.OuterServicesModels;
 using Profiles.Domain.Interfaces;
@@ -27,7 +27,7 @@ public class DoctorsService : IDoctorsService
 
     public async Task<DoctorResponseDTO> CreateDoctorAsync(DoctorCreateDTO newDoctor)
     {
-        var newPersonalInfo = _mapper.Map<PersonalInformation>(newDoctor.PersonalInfo);
+        var newPersonalInfo = _mapper.Map<PersonalInfo>(newDoctor.PersonalInfo);
 
         var createdPersonalInfo = await _repositoryManager.PersonalInfoRepository
             .AddPersonalInfoAsync(newPersonalInfo);
@@ -36,11 +36,11 @@ public class DoctorsService : IDoctorsService
         {
             Email = newDoctor.Email,
             CreatedAt = DateTime.UtcNow,
-            PersonalInformationId = createdPersonalInfo.PersonalInformationId,
+            PersonalInfoId = createdPersonalInfo.PersonalInfoId,
             UpdatedAt = DateTime.UtcNow
         };
 
-        var createdAccount = await _repositoryManager.AccountRepository.CreateAsync(newAccount);
+        var createdAccount = await _repositoryManager.AccountsRepository.CreateAsync(newAccount);
 
         var doctorForCreation = _mapper.Map<Doctor>(newDoctor);
 

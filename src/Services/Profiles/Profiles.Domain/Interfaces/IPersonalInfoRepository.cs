@@ -4,5 +4,5 @@ namespace Profiles.Domain.Interfaces;
 
 public interface IPersonalInfoRepository
 {
-    public Task<PersonalInformation> AddPersonalInfoAsync(PersonalInformation accountPersonalInformation);
+    public Task<PersonalInfo> AddPersonalInfoAsync(PersonalInfo accountPersonalInformation);
 }

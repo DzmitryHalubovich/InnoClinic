@@ -14,5 +14,6 @@ public class ProfilesDbContext : DbContext
 
     public DbSet<Account> Accounts { get; set; }
 
-    public DbSet<PersonalInformation> PersonalInfo { get; set; }
+    public DbSet<PersonalInfo> PersonalInfo { get; set; }
+    public DbSet<Patient> Patients { get; set; }
 }

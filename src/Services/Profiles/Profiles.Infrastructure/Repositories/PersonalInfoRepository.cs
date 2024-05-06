@@ -13,7 +13,7 @@ public class PersonalInfoRepository : IPersonalInfoRepository
         _context = context;
     }
 
-    public async Task<PersonalInformation> AddPersonalInfoAsync(PersonalInformation accountPersonalInformation)
+    public async Task<PersonalInfo> AddPersonalInfoAsync(PersonalInfo accountPersonalInformation)
     {
         _context.PersonalInfo.Add(accountPersonalInformation);
         await _context.SaveChangesAsync();

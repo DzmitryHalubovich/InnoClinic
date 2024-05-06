@@ -4,5 +4,5 @@ namespace Profiles.Domain.Interfaces;
 
 public interface IAccountsRepository
 {
-    public Task<Account> CreateAsync(Account account);
+    public Task<Account> CreateAsync(Account newAccount);
 }
