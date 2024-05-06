@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Profiles.Domain.Interfaces;
+using Profiles.Infrastructure.Data;
 using Profiles.Infrastructure.Repositories;
 using Profiles.Services.Abstractions;
 using Profiles.Services.Services;
@@ -11,9 +13,14 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IDoctorsService, DoctorsService>();
 builder.Services.AddScoped<IDoctorsRepository, DoctorsRepository>();
+builder.Services.AddScoped<IAccountsRepository, AccountRepository>();
+builder.Services.AddScoped<IPersonalInfoRepository, PersonalInfoRepository>();
+builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddAutoMapper(typeof(MapperProfile));
 builder.Services.AddHttpClient();
 
+builder.Services.AddDbContext<ProfilesDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
 
 builder.Services.AddControllers()
 .AddApplicationPart(typeof(Profiles.Presentation.Controllers.DoctorsController).Assembly);

@@ -178,7 +178,7 @@ public class OfficesController : ControllerBase
         {
             var createdOffice = await _officesService.AddNewOfficeAsync(newOffice);
 
-            return CreatedAtRoute("GetOfficeById",  new { officeId = createdOffice.Id }, createdOffice);
+            return CreatedAtRoute("GetOfficeById",  new { officeId = createdOffice.OfficeId }, createdOffice);
         }
 
         return BadRequest(validationResult);

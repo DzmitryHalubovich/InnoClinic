@@ -6,7 +6,7 @@ public class Office
 {
     [BsonId]
     [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
-    public string Id { get; set; }
+    public string OfficeId { get; set; }
 
     [BsonElement("address")]
     public string Address { get; set; } = null!;

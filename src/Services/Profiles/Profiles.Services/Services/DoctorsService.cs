@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Profiles.Contracts.DTOs;
 using Profiles.Domain.Entities;
+using Profiles.Domain.Entities.OuterServicesModels;
 using Profiles.Domain.Interfaces;
 using Profiles.Services.Abstractions;
 using System.Net.Http.Json;
@@ -9,23 +10,52 @@ namespace Profiles.Services.Services;
 
 public class DoctorsService : IDoctorsService
 {
-    private readonly IDoctorsRepository _doctorsRepository;
+    private readonly IRepositoryManager _repositoryManager;
     private readonly IMapper _mapper;
     private readonly HttpClient _httpClient;
 
-    public DoctorsService(IDoctorsRepository doctorsRepository, IMapper mapper, IHttpClientFactory factory)
+    public DoctorsService(IRepositoryManager repositoryManager,
+        IMapper mapper, IHttpClientFactory factory)
     {
-        _doctorsRepository = doctorsRepository;
+        _repositoryManager = repositoryManager;
         _mapper = mapper;
         _httpClient = factory.CreateClient();
         _httpClient.BaseAddress = new Uri("https://localhost:7255/api/offices/");
     }
 
-    public async Task<List<DoctorResponseDTO>> GetAllDoctorsAsync()
+    public async Task<DoctorResponseDTO> CreateDoctorAsync(DoctorCreateDTO newDoctor)
     {
-        var doctors = _doctorsRepository.GetAll();
+        var newPersonalInfo = _mapper.Map<PersonalInformation>(newDoctor.PersonalInfo);
 
-        IEnumerable<string> officesIds = doctors.Select(x=>x.OfficeId).Distinct().ToList();
+        var createdPersonalInfo = await _repositoryManager.PersonalInfoRepository
+            .AddPersonalInfoAsync(newPersonalInfo);
+
+        var newAccount = new Account() 
+        {
+            Email = newDoctor.Email,
+            CreatedAt = DateTime.UtcNow,
+            PersonalInformationId = createdPersonalInfo.PersonalInformationId,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var createdAccount = await _repositoryManager.AccountRepository.CreateAsync(newAccount);
+
+        var createDoctor = _mapper.Map<Doctor>(newDoctor);
+
+        createDoctor.AccountId = createdAccount.AccountId;
+
+        var createdDoctor = await _repositoryManager.DoctorsRepository.CreateAsync(createDoctor);
+
+        var doctorResponse = _mapper.Map<DoctorResponseDTO>(createdDoctor);
+
+        return doctorResponse;
+    }
+
+    public async Task<List<DoctorResponseDTO>> GetAllDoctorsAsync(bool trackChanges)
+    {
+        var doctors = await _repositoryManager.DoctorsRepository.GetAllAsync(trackChanges);
+
+        IEnumerable<string> officesIds = doctors.Select(x => x.OfficeId).Distinct().ToList();
 
         string stringWithOfficesIds = string.Join(',', officesIds);
 
@@ -38,17 +68,14 @@ public class DoctorsService : IDoctorsService
 
         var mappedDoctors = _mapper.Map<List<DoctorResponseDTO>>(doctors);
 
-
         return mappedDoctors;
     }
 
-    public async Task<DoctorResponseDTO> GetDoctorByIdAsync(Guid doctorId)
+    public async Task<DoctorResponseDTO> GetDoctorByIdAsync(Guid doctorId, bool trackChanges)
     {
-        var doctor = _doctorsRepository.GetById(doctorId);
+        var doctor = await _repositoryManager.DoctorsRepository.GetByIdAsync(doctorId, trackChanges);
 
         doctor.Office = await _httpClient.GetFromJsonAsync<Office>($"{doctor.OfficeId}");
-
-
 
         var mappedDoctor = _mapper.Map<DoctorResponseDTO>(doctor);
 

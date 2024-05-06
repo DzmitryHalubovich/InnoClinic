@@ -71,7 +71,7 @@ public class OfficesService : IOfficesService
 
         var office = _mapper.Map<Office>(updatedOffice);
 
-        office.Id = officeId;
+        office.OfficeId = officeId;
 
         await _officesRepository.UpdateAsync(officeId, office);
     }
