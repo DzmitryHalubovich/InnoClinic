@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Profiles.Contracts.DTOs;
+using Profiles.Presentation.Pagination;
 using Profiles.Services.Abstractions;
 
 namespace Profiles.Presentation.Controllers;
@@ -16,9 +17,9 @@ public class DoctorsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> GetAll([FromQuery] DoctorsQueryParameters parameters)
     {
-        var doctors = await _doctorsService.GetAllDoctorsAsync(false);
+        var doctors = await _doctorsService.GetAllDoctorsAsync(parameters,false);
 
         return Ok(doctors);
     }

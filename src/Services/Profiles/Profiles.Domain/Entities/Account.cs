@@ -27,6 +27,4 @@ public class Account
     [NotMapped]
     public Guid UpdatedBy { get; set; }
     public DateTime UpdatedAt { get; set; }
-
-
 }

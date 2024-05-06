@@ -25,5 +25,5 @@ public class RepositoryManager : IRepositoryManager
     public IDoctorsRepository DoctorsRepository => _doctorsRepository.Value;
     public IPersonalInfoRepository PersonalInfoRepository => _personalInfoRepository.Value;
 
-    public Task SaveAsync() => _context.SaveChangesAsync();
+    public async Task SaveAsync() => await _context.SaveChangesAsync();
 }

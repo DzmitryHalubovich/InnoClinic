@@ -12,7 +12,6 @@ public class Doctor
     [Required]
     [MaxLength(60)]
     public string Status { get; set; } = null!;
-
     
     [Required]
     [MaxLength(24)]

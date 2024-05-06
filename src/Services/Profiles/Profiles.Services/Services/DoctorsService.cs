@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
 using Profiles.Contracts.DTOs;
 using Profiles.Domain.Entities;
 using Profiles.Domain.Entities.OuterServicesModels;
 using Profiles.Domain.Interfaces;
+using Profiles.Presentation.Pagination;
 using Profiles.Services.Abstractions;
 using System.Net.Http.Json;
 
@@ -40,20 +42,26 @@ public class DoctorsService : IDoctorsService
 
         var createdAccount = await _repositoryManager.AccountRepository.CreateAsync(newAccount);
 
-        var createDoctor = _mapper.Map<Doctor>(newDoctor);
+        var doctorForCreation = _mapper.Map<Doctor>(newDoctor);
 
-        createDoctor.AccountId = createdAccount.AccountId;
+        doctorForCreation.AccountId = createdAccount.AccountId;
 
-        var createdDoctor = await _repositoryManager.DoctorsRepository.CreateAsync(createDoctor);
+        var createdDoctor = await _repositoryManager.DoctorsRepository.CreateAsync(doctorForCreation);
 
         var doctorResponse = _mapper.Map<DoctorResponseDTO>(createdDoctor);
 
         return doctorResponse;
     }
 
-    public async Task<List<DoctorResponseDTO>> GetAllDoctorsAsync(bool trackChanges)
+    public async Task<List<DoctorResponseDTO>> GetAllDoctorsAsync(DoctorsQueryParameters parameters,bool trackChanges)
     {
-        var doctors = await _repositoryManager.DoctorsRepository.GetAllAsync(trackChanges);
+        var doctors = await _repositoryManager.DoctorsRepository
+            .GetAllAsync(parameters.SpecializationId, trackChanges);
+
+        if (doctors.IsNullOrEmpty())
+        {
+            throw new Exception();
+        }
 
         IEnumerable<string> officesIds = doctors.Select(x => x.OfficeId).Distinct().ToList();
 
