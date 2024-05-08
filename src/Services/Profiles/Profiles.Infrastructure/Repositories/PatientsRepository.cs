@@ -9,12 +9,10 @@ public class PatientsRepository : IPatientsRepository
 {
     private readonly ProfilesDbContext _context;
 
-    public PatientsRepository(ProfilesDbContext context)
-    {
+    public PatientsRepository(ProfilesDbContext context) => 
         _context = context;
-    }
 
-    public async Task<List<Patient>> GetAllAsync(bool trackChanges) => trackChanges
+    public async Task<List<Patient>> GetAllAsync(bool trackChanges) => !trackChanges
         ? await _context.Patients.AsNoTracking()
             .Include(p => p.Account)
             .ThenInclude(p => p.PersonalInfo)
@@ -24,27 +22,19 @@ public class PatientsRepository : IPatientsRepository
             .ThenInclude(a => a.PersonalInfo)
             .ToListAsync();
 
-    public async Task<Patient> CreateAsync(Patient newPatient)
-    {
+    public void Create(Patient newPatient) =>
         _context.Patients.Add(newPatient);
-        await _context.SaveChangesAsync();
-        return newPatient;
-    }
 
-    public async Task<Patient?> GetByIdAsync(Guid patientId, bool trackChanges) => trackChanges
+    public async Task<Patient?> GetByIdAsync(Guid patientId, bool trackChanges) => !trackChanges
         ? await _context.Patients.AsNoTracking()
             .Include(p => p.Account)
             .ThenInclude(a => a.PersonalInfo)
-            .FirstOrDefaultAsync(p => p.AccountId.Equals(patientId))
+            .FirstOrDefaultAsync(p => p.PatientId.Equals(patientId))
         : await _context.Patients
             .Include(p => p.Account)
             .ThenInclude(a => a.PersonalInfo)
-            .FirstOrDefaultAsync(p => p.AccountId.Equals(patientId));
+            .FirstOrDefaultAsync(p => p.PatientId.Equals(patientId));
 
-    public async Task DeleteAsync(Guid patientId)
-    {
-        var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId.Equals(patientId));
+    public void Delete(Patient patient) => 
         _context.Remove(patient);
-        await _context.SaveChangesAsync();
-    }
 }

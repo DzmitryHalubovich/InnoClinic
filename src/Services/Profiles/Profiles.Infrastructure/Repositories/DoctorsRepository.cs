@@ -8,32 +8,37 @@ namespace Profiles.Infrastructure.Repositories;
 public class DoctorsRepository : IDoctorsRepository
 {
     private readonly ProfilesDbContext _context;
-    public DoctorsRepository(ProfilesDbContext context)
-    {
+    public DoctorsRepository(ProfilesDbContext context) => 
         _context = context;
-    }
 
-    public async Task<Doctor?> CreateAsync(Doctor newDoctor)
-    {
+    public void Create(Doctor newDoctor) => 
         _context.Doctors.Add(newDoctor);
-        await _context.SaveChangesAsync();
-        return newDoctor;
-    }
 
-    public async Task<List<Doctor>> GetAllAsync(Guid? specializationId, bool trackChanges) => trackChanges
-        ? await _context.Doctors.FilterDoctorsBySpecialization(specializationId)
+    public async Task<List<Doctor>> GetAllAsync(Guid? specializationId, string? searchLastName, bool trackChanges) => !trackChanges
+        ? await _context.Doctors.AsNoTracking()
+                                .FilterDoctorsBySpecialization(specializationId)
+                                .Search(searchLastName)
                                 .Include(d => d.Account)
                                 .ThenInclude(a => a.PersonalInfo)
                                 .Include(d => d.Specialization)
                                 .ToListAsync()
-        : await _context.Doctors.AsNoTracking()
-                                .FilterDoctorsBySpecialization(specializationId)
+        : await _context.Doctors.FilterDoctorsBySpecialization(specializationId)
                                 .Include(d => d.Account)
                                 .ThenInclude(a => a.PersonalInfo)
                                 .Include(d => d.Specialization)
                                 .ToListAsync();
-    
-    public async Task<Doctor?> GetByIdAsync(Guid doctorId, bool trackChanges) => trackChanges
-        ? await _context.Doctors.FirstOrDefaultAsync(d => d.DoctorId.Equals(doctorId))
-        : await _context.Doctors.AsNoTracking().FirstOrDefaultAsync(d => d.DoctorId.Equals(doctorId));
+
+    public async Task<Doctor?> GetByIdAsync(Guid doctorId, bool trackChanges) => !trackChanges
+        ? await _context.Doctors.AsNoTracking()
+                                .Include(d => d.Specialization)
+                                .Include(d => d.Account)
+                                .ThenInclude(a => a.PersonalInfo)
+                                .FirstOrDefaultAsync(d => d.DoctorId.Equals(doctorId))
+        : await _context.Doctors.Include(d => d.Specialization)
+                                .Include(d => d.Account)
+                                .ThenInclude(a => a.PersonalInfo)
+                                .FirstOrDefaultAsync(d => d.DoctorId.Equals(doctorId));
+
+    public void Update(Doctor editedDoctor) =>
+        _context.Doctors.Update(editedDoctor);
 }

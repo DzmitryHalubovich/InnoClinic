@@ -1,13 +1,21 @@
 using Microsoft.EntityFrameworkCore;
+using Profiles.API.Extensions;
 using Profiles.Domain.Interfaces;
 using Profiles.Infrastructure.Data;
 using Profiles.Infrastructure.Repositories;
 using Profiles.Services.Abstractions;
 using Profiles.Services.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.WriteTo.Console()
+    .ReadFrom.Configuration(ctx.Configuration));
+
+builder.Logging.ClearProviders();
 
 builder.Services.AddControllers();
 
@@ -33,6 +41,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+var logger = app.Services.GetRequiredService<Serilog.ILogger>();
+app.ConfigureExceptionHandler(logger);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

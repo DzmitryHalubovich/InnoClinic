@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using Profiles.Domain.Entities.OuterServicesModels;
 
 namespace Profiles.Domain.Entities;
@@ -9,9 +8,8 @@ public class Doctor
     public Guid DoctorId { get; set; }
     [Required]
     public DateTime CareerStartYear { get; set; }
-    [Required]
-    [MaxLength(60)]
-    public string Status { get; set; } = null!;
+
+    public string Status { get; set; }
     
     [Required]
     [MaxLength(24)]

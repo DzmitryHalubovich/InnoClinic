@@ -7,6 +7,7 @@ public class DoctorCreateDTO
 {
     public PersonalInfoCreateDTO PersonalInfo { get; set; }
     public Guid SpecializationId { get; set; }
+    public DateTime CareerStartYear { get; set; }
     [EmailAddress]
     public string Email { get; set; }
     public string OfficeId { get; set; }

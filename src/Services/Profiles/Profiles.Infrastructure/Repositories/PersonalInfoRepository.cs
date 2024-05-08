@@ -19,4 +19,7 @@ public class PersonalInfoRepository : IPersonalInfoRepository
         await _context.SaveChangesAsync();
         return accountPersonalInformation;
     }
+
+    public void UpdatePersonalInfo(PersonalInfo updatedPersonalInfo) => 
+        _context.PersonalInfo.Update(updatedPersonalInfo);
 }

@@ -3,4 +3,6 @@
 public class DoctorsQueryParameters
 {
     public Guid? SpecializationId { get; set; }
+
+    public string? SearchLastName {  get; set; }
 }

@@ -12,8 +12,8 @@ using Profiles.Infrastructure.Data;
 namespace Profiles.Infrastructure.Migrations
 {
     [DbContext(typeof(ProfilesDbContext))]
-    [Migration("20240503120502_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20240506131209_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,18 +34,32 @@ namespace Profiles.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<Guid>("PersonalInformationId")
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PersonalInfoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PhotoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("AccountId");
+
+                    b.HasIndex("PersonalInfoId");
 
                     b.ToTable("Accounts");
                 });
@@ -67,8 +81,7 @@ namespace Profiles.Infrastructure.Migrations
                         .HasMaxLength(24)
                         .HasColumnType("nvarchar(24)");
 
-                    b.Property<Guid?>("SpecializationId")
-                        .IsRequired()
+                    b.Property<Guid>("SpecializationId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -78,12 +91,35 @@ namespace Profiles.Infrastructure.Migrations
 
                     b.HasKey("DoctorId");
 
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("SpecializationId");
+
                     b.ToTable("Doctors");
                 });
 
-            modelBuilder.Entity("Profiles.Domain.Entities.PersonalInformation", b =>
+            modelBuilder.Entity("Profiles.Domain.Entities.Patient", b =>
                 {
-                    b.Property<Guid>("PersonalInformationId")
+                    b.Property<Guid>("PatientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PhotoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("PatientId");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Patients");
+                });
+
+            modelBuilder.Entity("Profiles.Domain.Entities.PersonalInfo", b =>
+                {
+                    b.Property<Guid>("PersonalInfoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -109,7 +145,7 @@ namespace Profiles.Infrastructure.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.HasKey("PersonalInformationId");
+                    b.HasKey("PersonalInfoId");
 
                     b.ToTable("PersonalInfo");
                 });
@@ -131,6 +167,47 @@ namespace Profiles.Infrastructure.Migrations
                     b.HasKey("SpecializationId");
 
                     b.ToTable("Specializations");
+                });
+
+            modelBuilder.Entity("Profiles.Domain.Entities.Account", b =>
+                {
+                    b.HasOne("Profiles.Domain.Entities.PersonalInfo", "PersonalInfo")
+                        .WithMany()
+                        .HasForeignKey("PersonalInfoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PersonalInfo");
+                });
+
+            modelBuilder.Entity("Profiles.Domain.Entities.Doctor", b =>
+                {
+                    b.HasOne("Profiles.Domain.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Profiles.Domain.Entities.Specialization", "Specialization")
+                        .WithMany()
+                        .HasForeignKey("SpecializationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("Specialization");
+                });
+
+            modelBuilder.Entity("Profiles.Domain.Entities.Patient", b =>
+                {
+                    b.HasOne("Profiles.Domain.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
                 });
 #pragma warning restore 612, 618
         }

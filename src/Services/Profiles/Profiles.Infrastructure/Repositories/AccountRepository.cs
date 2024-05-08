@@ -13,10 +13,6 @@ public class AccountRepository : IAccountsRepository
         _context = context;
     }
 
-    public async Task<Account> CreateAsync(Account account)
-    {
+    public void Create(Account account) => 
         _context.Accounts.Add(account);
-        await _context.SaveChangesAsync();
-        return account;
-    }
 }

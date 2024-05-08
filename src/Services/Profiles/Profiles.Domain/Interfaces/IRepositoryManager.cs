@@ -1,14 +1,11 @@
-﻿namespace Profiles.Domain.Interfaces
-{
-    public interface IRepositoryManager
-    {
-        public IAccountsRepository AccountsRepository { get; }
-        public IDoctorsRepository DoctorsRepository { get; }
-        public IPersonalInfoRepository PersonalInfoRepository { get; }
-        public IPatientsRepository PatientsRepository { get; }
+﻿namespace Profiles.Domain.Interfaces;
 
-        public Task BeginTransactionAsync();
-        public Task CommitTransactionAsync();
-        public Task SaveAsync();
-    }
+public interface IRepositoryManager
+{
+    public IAccountsRepository AccountsRepository { get; }
+    public IDoctorsRepository DoctorsRepository { get; }
+    public IPersonalInfoRepository PersonalInfoRepository { get; }
+    public IPatientsRepository PatientsRepository { get; }
+    public IReceptionistsRepository ReceptionistsRepository { get; }
+    public Task SaveAsync();
 }

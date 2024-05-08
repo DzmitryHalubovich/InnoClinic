@@ -9,25 +9,25 @@ namespace Profiles.Presentation.Controllers;
 [Route("api/doctors")]
 public class DoctorsController : ControllerBase
 {
-    private readonly IDoctorsService _doctorsService;
+    private readonly IServiceManager _serviceManager;
 
-    public DoctorsController(IDoctorsService doctorsService)
+    public DoctorsController(IServiceManager serviceManager)
     {
-        _doctorsService = doctorsService;
+        _serviceManager = serviceManager;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] DoctorsQueryParameters parameters)
     {
-        var doctors = await _doctorsService.GetAllDoctorsAsync(parameters,false);
+        var doctors = await _serviceManager.DoctorsService.GetAllDoctorsAsync(parameters,false);
 
         return Ok(doctors);
     }
 
-    [HttpGet("{doctorId}")]
+    [HttpGet("{doctorId}", Name = "GetDoctorById")]
     public async Task<IActionResult> GetById([FromRoute] Guid doctorId)
     {
-        var doctor = await _doctorsService.GetDoctorByIdAsync(doctorId, false);
+        var doctor = await _serviceManager.DoctorsService.GetDoctorByIdAsync(doctorId, false);
 
         return Ok(doctor);
     }
@@ -35,14 +35,16 @@ public class DoctorsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> AddDoctor([FromBody] DoctorCreateDTO newDoctor)
     {
-        var createdDoctor = await _doctorsService.CreateDoctorAsync(newDoctor);
+        var createdDoctor = await _serviceManager.DoctorsService.CreateDoctorAsync(newDoctor);
 
-        return Ok(createdDoctor);
+        return CreatedAtRoute("GetDoctorById", new { doctorId = createdDoctor.DoctorId }, createdDoctor);
     }
 
     [HttpPut("{doctorId}")]
     public async Task<IActionResult> UpdateDoctor([FromRoute] Guid doctorId, [FromBody] DoctorUpdateDTO editedDotctor)
     {
+        await _serviceManager.DoctorsService.UpdateDoctorAsync(doctorId, editedDotctor);
 
+        return NoContent();
     }
 }

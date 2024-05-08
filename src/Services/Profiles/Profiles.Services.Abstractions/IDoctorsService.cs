@@ -8,4 +8,5 @@ public interface IDoctorsService
     public Task<List<DoctorResponseDTO>> GetAllDoctorsAsync(DoctorsQueryParameters parameters, bool trackChanges);
     public Task<DoctorResponseDTO> GetDoctorByIdAsync(Guid doctorId, bool trackChanges);
     public Task<DoctorResponseDTO> CreateDoctorAsync(DoctorCreateDTO newDoctor);
+    public Task UpdateDoctorAsync(Guid doctorId, DoctorUpdateDTO editedDoctor);
 }

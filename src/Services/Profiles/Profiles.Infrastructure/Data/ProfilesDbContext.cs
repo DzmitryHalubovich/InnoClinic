@@ -9,11 +9,9 @@ public class ProfilesDbContext : DbContext
     { }
 
     public DbSet<Doctor> Doctors { get; set; }
-
+    public DbSet<Receptionist> Receptionists { get; set; }
     public DbSet<Specialization> Specializations { get; set; }
-
     public DbSet<Account> Accounts { get; set; }
-
     public DbSet<PersonalInfo> PersonalInfo { get; set; }
     public DbSet<Patient> Patients { get; set; }
 }

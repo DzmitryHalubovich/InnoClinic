@@ -31,16 +31,28 @@ namespace Profiles.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
+
                     b.Property<Guid>("PersonalInfoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("PhotoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("AccountId");
 
@@ -135,6 +147,27 @@ namespace Profiles.Infrastructure.Migrations
                     b.ToTable("PersonalInfo");
                 });
 
+            modelBuilder.Entity("Profiles.Domain.Entities.Receptionist", b =>
+                {
+                    b.Property<Guid>("ReceptionistId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OfficeId")
+                        .IsRequired()
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.HasKey("ReceptionistId");
+
+                    b.HasIndex("AccountId");
+
+                    b.ToTable("Receptionists");
+                });
+
             modelBuilder.Entity("Profiles.Domain.Entities.Specialization", b =>
                 {
                     b.Property<Guid>("SpecializationId")
@@ -185,6 +218,17 @@ namespace Profiles.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("Profiles.Domain.Entities.Patient", b =>
+                {
+                    b.HasOne("Profiles.Domain.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Profiles.Domain.Entities.Receptionist", b =>
                 {
                     b.HasOne("Profiles.Domain.Entities.Account", "Account")
                         .WithMany()

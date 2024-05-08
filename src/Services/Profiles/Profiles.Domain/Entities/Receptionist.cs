@@ -1,16 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Profiles.Domain.Entities;
 
-public class Patient
+public class Receptionist
 {
-    public Guid PatientId { get; set; }
+    [Required]
+    public Guid ReceptionistId { get; set; }
 
     [Required]
-    [ForeignKey("Account")]
+    [MaxLength(24)]
+    public string OfficeId { get; set; }
+
+
+    [Required]
     public Guid AccountId { get; set; }
     public Account Account { get; set; }
-
-    public Guid? PhotoId { get; set; }
 }

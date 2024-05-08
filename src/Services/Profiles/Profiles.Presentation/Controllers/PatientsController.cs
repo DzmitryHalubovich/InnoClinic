@@ -20,11 +20,6 @@ public class PatientsController : ControllerBase
     {
         var patients = await _serviceManager.PatientsService.GetAllPatientsAsync(false);
 
-        if (!patients.Any())
-        {
-            return NotFound();
-        }
-
         return Ok(patients);
     }
 
