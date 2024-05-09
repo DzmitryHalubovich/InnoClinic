@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Profiles.Contracts.Pagination;
 using Profiles.Domain.Entities;
 using Profiles.Domain.Interfaces;
 using Profiles.Infrastructure.Data;
@@ -14,31 +15,24 @@ public class DoctorsRepository : IDoctorsRepository
     public void Create(Doctor newDoctor) => 
         _context.Doctors.Add(newDoctor);
 
-    public async Task<List<Doctor>> GetAllAsync(Guid? specializationId, string? searchLastName, bool trackChanges) => !trackChanges
+    public async Task<List<Doctor>> GetAllAsync(DoctorsQueryParameters queryParameters, bool trackChanges) => !trackChanges
         ? await _context.Doctors.AsNoTracking()
-                                .FilterDoctorsBySpecialization(specializationId)
-                                .Search(searchLastName)
+                                .FilterDoctorsBySpecialization(queryParameters.SpecializationId)
+                                .Search(queryParameters.SearchFullName)
                                 .Include(d => d.Account)
-                                .ThenInclude(a => a.PersonalInfo)
-                                .Include(d => d.Specialization)
                                 .ToListAsync()
-        : await _context.Doctors.FilterDoctorsBySpecialization(specializationId)
+        : await _context.Doctors.FilterDoctorsBySpecialization(queryParameters.SpecializationId)
+                                .Search(queryParameters.SearchFullName)
                                 .Include(d => d.Account)
-                                .ThenInclude(a => a.PersonalInfo)
-                                .Include(d => d.Specialization)
                                 .ToListAsync();
 
-    public async Task<Doctor?> GetByIdAsync(Guid doctorId, bool trackChanges) => !trackChanges
+    public async Task<Doctor?> GetByIdAsync(Guid id, bool trackChanges) => !trackChanges
         ? await _context.Doctors.AsNoTracking()
-                                .Include(d => d.Specialization)
                                 .Include(d => d.Account)
-                                .ThenInclude(a => a.PersonalInfo)
-                                .FirstOrDefaultAsync(d => d.DoctorId.Equals(doctorId))
-        : await _context.Doctors.Include(d => d.Specialization)
-                                .Include(d => d.Account)
-                                .ThenInclude(a => a.PersonalInfo)
-                                .FirstOrDefaultAsync(d => d.DoctorId.Equals(doctorId));
+                                .FirstOrDefaultAsync(d => d.Id.Equals(id))
+        : await _context.Doctors.Include(d => d.Account)
+                                .FirstOrDefaultAsync(d => d.Id.Equals(id));
 
-    public void Update(Doctor editedDoctor) =>
-        _context.Doctors.Update(editedDoctor);
+    public void Delete(Doctor doctor) =>
+        _context.Doctors.Remove(doctor);
 }

@@ -1,10 +1,17 @@
-﻿namespace Profiles.Contracts.DTOs.PersonalInfo;
+﻿using System.ComponentModel.DataAnnotations;
 
-public class PersonalInfoResponseDTO
+namespace Profiles.Contracts.DTOs.Patient;
+
+public class PatientUpdateDTO
 {
     public string FirstName { get; set; } = null!;
+
     public string LastName { get; set; } = null!;
+
     public string? MiddleName { get; set; }
+
+    [Phone]
+    public string PhoneNumber { get; set; } = null!;    
+
     public DateTime DateOfBirth { get; set; }
-    public string PhoneNumber { get; set; }
 }

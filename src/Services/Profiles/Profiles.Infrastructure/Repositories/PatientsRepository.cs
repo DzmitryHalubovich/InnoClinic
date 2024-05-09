@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Profiles.Contracts.Pagination;
 using Profiles.Domain.Entities;
 using Profiles.Domain.Interfaces;
 using Profiles.Infrastructure.Data;
@@ -12,28 +13,24 @@ public class PatientsRepository : IPatientsRepository
     public PatientsRepository(ProfilesDbContext context) => 
         _context = context;
 
-    public async Task<List<Patient>> GetAllAsync(bool trackChanges) => !trackChanges
+    public async Task<List<Patient>> GetAllAsync(PatientsQueryParameters queryParameters, bool trackChanges) => !trackChanges
         ? await _context.Patients.AsNoTracking()
-            .Include(p => p.Account)
-            .ThenInclude(p => p.PersonalInfo)
-            .ToListAsync()
-        : await _context.Patients
-            .Include(p => p.Account)
-            .ThenInclude(a => a.PersonalInfo)
-            .ToListAsync();
+                                 .Search(queryParameters.SearchFullName)
+                                 .Include(p => p.Account)
+                                 .ToListAsync()
+        : await _context.Patients.Include(p => p.Account)
+                                 .Search(queryParameters.SearchFullName)
+                                 .ToListAsync();
+
+    public async Task<Patient?> GetByIdAsync(Guid id, bool trackChanges) => !trackChanges
+        ? await _context.Patients.AsNoTracking()
+                                 .Include(p => p.Account)
+                                 .FirstOrDefaultAsync(p => p.Id.Equals(id))
+        : await _context.Patients.Include(p => p.Account)
+                                 .FirstOrDefaultAsync(p => p.Id.Equals(id));
 
     public void Create(Patient newPatient) =>
         _context.Patients.Add(newPatient);
-
-    public async Task<Patient?> GetByIdAsync(Guid patientId, bool trackChanges) => !trackChanges
-        ? await _context.Patients.AsNoTracking()
-            .Include(p => p.Account)
-            .ThenInclude(a => a.PersonalInfo)
-            .FirstOrDefaultAsync(p => p.PatientId.Equals(patientId))
-        : await _context.Patients
-            .Include(p => p.Account)
-            .ThenInclude(a => a.PersonalInfo)
-            .FirstOrDefaultAsync(p => p.PatientId.Equals(patientId));
 
     public void Delete(Patient patient) => 
         _context.Remove(patient);

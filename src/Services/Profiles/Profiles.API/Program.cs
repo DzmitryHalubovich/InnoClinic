@@ -1,15 +1,18 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Profiles.API.Extensions;
+using Profiles.Contracts.DTOs.Doctor;
+using Profiles.Contracts.DTOs.Patient;
+using Profiles.Contracts.DTOs.Receptionist;
 using Profiles.Domain.Interfaces;
 using Profiles.Infrastructure.Data;
 using Profiles.Infrastructure.Repositories;
+using Profiles.Presentation.Validators;
 using Profiles.Services.Abstractions;
 using Profiles.Services.Services;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Host.UseSerilog((ctx, lc) =>
     lc.WriteTo.Console()
@@ -17,35 +20,16 @@ builder.Host.UseSerilog((ctx, lc) =>
 
 builder.Logging.ClearProviders();
 
-builder.Services.AddControllers();
+ValidatorOptions.Global.LanguageManager.Enabled = false;
 
-builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
-builder.Services.AddScoped<IServiceManager, ServiceManager>();
-builder.Services.AddScoped<IDoctorsService, DoctorsService>();
-builder.Services.AddScoped<IPatientsService, PatientsService>();
-builder.Services.AddScoped<IDoctorsRepository, DoctorsRepository>();
-builder.Services.AddScoped<IAccountsRepository, AccountRepository>();
-builder.Services.AddScoped<IPersonalInfoRepository, PersonalInfoRepository>();
-builder.Services.AddScoped<IPatientsRepository, PatientsRepository>();
-builder.Services.AddAutoMapper(typeof(MapperProfile));
-builder.Services.AddHttpClient();
-
-builder.Services.AddDbContext<ProfilesDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
-
-builder.Services.AddControllers()
-.AddApplicationPart(typeof(Profiles.Presentation.Controllers.DoctorsController).Assembly);
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+ConfigureServices(builder.Services);
 
 var app = builder.Build();
 
 var logger = app.Services.GetRequiredService<Serilog.ILogger>();
+
 app.ConfigureExceptionHandler(logger);
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -59,3 +43,28 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+void ConfigureServices(IServiceCollection services)
+{
+    services.AddScoped<IValidator<DoctorCreateDTO>, DoctorCreateValidator>();
+    services.AddScoped<IValidator<DoctorUpdateDTO>, DoctorUpdateValidator>();
+    services.AddScoped<IValidator<PatientCreateDTO>, PatientCreateValidator>();
+    services.AddScoped<IValidator<PatientUpdateDTO>, PatientUpdateValidator>();    
+    services.AddScoped<IValidator<ReceptionistCreateDTO>, ReceptionistCreateValidator>();
+    services.AddScoped<IValidator<ReceptionistUpdateDTO>, ReceptionistUpdateValidator>();
+    services.AddScoped<IRepositoryManager, RepositoryManager>();
+    services.AddScoped<IServiceManager, ServiceManager>();
+    services.AddScoped<IDoctorsService, DoctorsService>();
+    services.AddScoped<IPatientsService, PatientsService>();
+    services.AddScoped<IDoctorsRepository, DoctorsRepository>();
+    services.AddScoped<IAccountsRepository, AccountRepository>();
+    services.AddScoped<IPatientsRepository, PatientsRepository>();
+    services.AddAutoMapper(typeof(MapperProfile));
+    services.AddHttpClient();
+    services.AddDbContext<ProfilesDbContext>(opt =>
+        opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+    services.AddControllers()
+        .AddApplicationPart(typeof(Profiles.Presentation.Controllers.DoctorsController).Assembly);
+    services.AddEndpointsApiExplorer();
+    services.AddSwaggerGen();
+}

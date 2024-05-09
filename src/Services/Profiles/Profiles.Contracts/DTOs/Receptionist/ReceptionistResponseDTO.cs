@@ -1,10 +1,16 @@
-﻿using Profiles.Contracts.DTOs.PersonalInfo;
+﻿using Profiles.Contracts.DTOs.OuterServicesModels;
 
 namespace Profiles.Contracts.DTOs.Receptionist;
 
 public class ReceptionistResponseDTO
 {
-    public Guid ReceptionistId { get; set; }
+    public Guid Id { get; set; }
 
-    public PersonalInfoResponseDTO PersonalInfo { get; set; }
+    public string FirstName { get; set; } = null!;
+
+    public string LastName { get; set; } = null!;
+
+    public string? MiddleName { get; set; }
+
+    public OfficeDTO? Office { get; set; }
 }

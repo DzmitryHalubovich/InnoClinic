@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using Profiles.Contracts.DTOs.Patient;
+using Profiles.Contracts.Pagination;
 using Profiles.Domain.Entities;
 using Profiles.Domain.Exceptions;
 using Profiles.Domain.Interfaces;
@@ -19,9 +20,9 @@ public class PatientsService : IPatientsService
         _mapper = mapper;
     }
 
-    public async Task<List<PatientResponseDTO>> GetAllPatientsAsync(bool trackCahanges)
+    public async Task<List<PatientResponseDTO>> GetAllPatientsAsync(PatientsQueryParameters queryParameters, bool trackCahanges)
     {
-        var patients = await _repositoryManager.PatientsRepository.GetAllAsync(trackCahanges);
+        var patients = await _repositoryManager.PatientsRepository.GetAllAsync(queryParameters, trackCahanges);
 
         if (patients.IsNullOrEmpty())
         {
@@ -33,13 +34,13 @@ public class PatientsService : IPatientsService
         return mappedPatients;
     }
 
-    public async Task<PatientResponseDTO> GetPatientByIdAsync(Guid patientId, bool trackChanges)
+    public async Task<PatientResponseDTO?> GetPatientByIdAsync(Guid id, bool trackChanges)
     {
-        var patient = await _repositoryManager.PatientsRepository.GetByIdAsync(patientId, trackChanges);
+        var patient = await _repositoryManager.PatientsRepository.GetByIdAsync(id, trackChanges);
 
         if (patient is null)
         {
-            throw new NotFoundException($"The patient with id: {patientId} was not found in the database.");
+            throw new NotFoundException($"The patient with id: {id} was not found in the database.");
         }
 
         var mappedPatient = _mapper.Map<PatientResponseDTO>(patient);
@@ -49,14 +50,11 @@ public class PatientsService : IPatientsService
 
     public async Task<PatientResponseDTO> CreatePatientAsync(PatientCreateDTO newPatient)
     {
-        var personalInfo = _mapper.Map<PersonalInfo>(newPatient.PersonalInfo);
-
         var newAccount = new Account()
         {
-            PersonalInfo = personalInfo,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Email = newPatient.Email
+            PhoneNumber = newPatient.PhoneNumber,
         };
 
         _repositoryManager.AccountsRepository.Create(newAccount);
@@ -64,27 +62,41 @@ public class PatientsService : IPatientsService
         var newPatientEntity = new Patient()
         {
             Account = newAccount,
+            FirstName = newPatient.FirstName,
+            LastName = newPatient.LastName,
+            MiddleName = newPatient.MiddleName,
+            DateOfBirth = newPatient.DateOfBirth,
         };
 
         _repositoryManager.PatientsRepository.Create(newPatientEntity);
 
-        var patientResult = _mapper.Map<PatientResponseDTO>(newPatientEntity);
-
         await _repositoryManager.SaveAsync();
+
+        var patientResult = _mapper.Map<PatientResponseDTO>(newPatientEntity);
 
         return patientResult;
     }
 
-    public async Task DeletePatientAsync(Guid patientId)
+    public async Task UpdatePatientAsync(Guid id, PatientUpdateDTO updatedPatient)
     {
-        var patientEntity = await _repositoryManager.PatientsRepository.GetByIdAsync(patientId, true);
+        var patientEntity = await _repositoryManager.PatientsRepository.GetByIdAsync(id, true);
 
         if (patientEntity is null)
         {
             throw new Exception();
         }
 
-        _repositoryManager.PatientsRepository.Delete(patientEntity);
+        _mapper.Map(updatedPatient, patientEntity);
+
+        await _repositoryManager.SaveAsync();
+    }
+
+    public async Task DeletePatientAsync(Guid id)
+    {
+        var patientEntity = await _repositoryManager.PatientsRepository.GetByIdAsync(id, true);
+
+        _repositoryManager.AccountsRepository.Delete(patientEntity.Account);
+
         await _repositoryManager.SaveAsync();
     }
 }

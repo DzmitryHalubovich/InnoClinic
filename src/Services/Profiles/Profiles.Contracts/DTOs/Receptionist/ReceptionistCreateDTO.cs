@@ -1,10 +1,17 @@
-﻿using Profiles.Contracts.DTOs.PersonalInfo;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Profiles.Contracts.DTOs.Receptionist;
 
 public class ReceptionistCreateDTO
 {
-    public PersonalInfoCreateDTO PersonalInfo { get; set; }
-    public string Email { get; set; }
-    public string OfficeId { get; set; }
+    public string FirstName { get; set; } = null!;
+
+    public string LastName { get; set; } = null!;
+
+    public string? MiddleName { get; set; }
+
+    [EmailAddress]
+    public string Email { get; set; } = null!;
+
+    public string OfficeId { get; set; } = null!;
 }

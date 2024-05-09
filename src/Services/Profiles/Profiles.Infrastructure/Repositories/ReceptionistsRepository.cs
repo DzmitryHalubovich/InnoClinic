@@ -14,23 +14,17 @@ public class ReceptionistsRepository : IReceptionistsRepository
 
     public async Task<List<Receptionist>> GetAllAsync(bool trackChanges) => !trackChanges
         ? await _context.Receptionists.AsNoTracking()
-            .Include(r => r.Account)
-            .ThenInclude(a => a.PersonalInfo)
-            .ToListAsync()
-        : await _context.Receptionists
-            .Include(r => r.Account)
-            .ThenInclude(a => a.PersonalInfo)
-            .ToListAsync();
+                                      .Include(r => r.Account)
+                                      .ToListAsync()
+        : await _context.Receptionists.Include(r => r.Account)
+                                      .ToListAsync();
 
     public async Task<Receptionist?> GetByIdAsync(Guid receptionistId, bool trackChanges) => !trackChanges
         ? await _context.Receptionists.AsNoTracking()
-            .Include(r => r.Account)
-            .ThenInclude(a => a.PersonalInfo)
-            .FirstOrDefaultAsync(r => r.ReceptionistId.Equals(receptionistId))
-        : await _context.Receptionists
-            .Include(r => r.Account)
-            .ThenInclude(a => a.PersonalInfo)
-            .FirstOrDefaultAsync(r => r.ReceptionistId.Equals(receptionistId));
+                                      .Include(r => r.Account)
+                                      .FirstOrDefaultAsync(r => r.Id.Equals(receptionistId))
+        : await _context.Receptionists.Include(r => r.Account)
+                                      .FirstOrDefaultAsync(r => r.Id.Equals(receptionistId));
 
     public void Create(Receptionist newReceptionist) =>
         _context.Receptionists.Add(newReceptionist);

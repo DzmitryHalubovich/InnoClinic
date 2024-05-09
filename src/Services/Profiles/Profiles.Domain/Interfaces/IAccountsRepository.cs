@@ -5,4 +5,5 @@ namespace Profiles.Domain.Interfaces;
 public interface IAccountsRepository
 {
     public void Create(Account newAccount);
+    public void Delete(Account account);
 }

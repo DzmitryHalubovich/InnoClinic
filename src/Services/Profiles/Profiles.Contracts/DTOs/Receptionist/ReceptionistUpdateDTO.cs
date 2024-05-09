@@ -1,9 +1,12 @@
-﻿using Profiles.Contracts.DTOs.PersonalInfo;
-
-namespace Profiles.Contracts.DTOs.Receptionist;
+﻿namespace Profiles.Contracts.DTOs.Receptionist;
 
 public class ReceptionistUpdateDTO
 {
-    public PersonalInfoUpdateDTO PersonalInfo { get; set; }
-    public string OfficeId { get; set; }
+    public string FirstName { get; set; } = null!;
+
+    public string LastName { get; set; } = null!;
+
+    public string? MiddleName { get; set; }
+
+    public string OfficeId { get; set; } = null!;
 }

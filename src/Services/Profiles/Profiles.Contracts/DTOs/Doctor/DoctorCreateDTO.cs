@@ -1,15 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Profiles.Contracts.DTOs.PersonalInfo;
 
 namespace Profiles.Contracts.DTOs.Doctor;
 
 public class DoctorCreateDTO
 {
-    public PersonalInfoCreateDTO PersonalInfo { get; set; }
-    public Guid SpecializationId { get; set; }
-    public DateTime CareerStartYear { get; set; }
+    public string FirstName { get; set; } = null!;
+
+    public string LastName { get; set; } = null!;
+
+    public string? MiddleName { get; set; }
+
+    public DateTime DateOfBirth { get; set; }
+
     [EmailAddress]
-    public string Email { get; set; }
-    public string OfficeId { get; set; }
-    public string Status { get; set; }
+    public string Email { get; set; } = null!;
+
+    public Guid SpecializationId { get; set; }
+
+    public string OfficeId { get; set; } = null!;
+
+    public DateTime CareerStartYear { get; set; }
+
+    public StatusDTO Status { get; set; }
 }

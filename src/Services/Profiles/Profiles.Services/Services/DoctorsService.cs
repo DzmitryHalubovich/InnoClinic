@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
 using Profiles.Contracts.DTOs.Doctor;
+using Profiles.Contracts.DTOs.OuterServicesModels;
+using Profiles.Contracts.Pagination;
 using Profiles.Domain.Entities;
-using Profiles.Domain.Entities.OuterServicesModels;
 using Profiles.Domain.Exceptions;
 using Profiles.Domain.Interfaces;
-using Profiles.Presentation.Pagination;
 using Profiles.Services.Abstractions;
 using System.Net.Http.Json;
 
@@ -28,88 +28,127 @@ public class DoctorsService : IDoctorsService
 
     public async Task<DoctorResponseDTO> CreateDoctorAsync(DoctorCreateDTO newDoctor)
     {
-        var newPersonalInfo = _mapper.Map<PersonalInfo>(newDoctor.PersonalInfo);
-
         var newAccount = new Account()
         {
-            PersonalInfo = newPersonalInfo,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Email = newDoctor.Email
+            Email = newDoctor.Email,
         };
 
         _repositoryManager.AccountsRepository.Create(newAccount);
 
+        var status = _mapper.Map<Status>(newDoctor.Status);
+        
         var newDoctorEnity = new Doctor()
         {
             Account = newAccount,
             OfficeId = newDoctor.OfficeId,
-            CareerStartYear = DateTime.UtcNow,
-            Status = newDoctor.Status,
+            FirstName = newDoctor.FirstName,
+            LastName = newDoctor.LastName,
+            MiddleName = newDoctor.MiddleName,
+            DateOfBirth = newDoctor.DateOfBirth,
+            SpecializationId = newDoctor.SpecializationId,
+            CareerStartYear = DateTime.Now,
+            Status = status,
         };
-        
-        _repositoryManager.DoctorsRepository.Create(newDoctorEnity);
 
-        var doctorResult = _mapper.Map<DoctorResponseDTO>(newDoctorEnity);
+        try
+        {
+            var office = await _httpClient.GetFromJsonAsync<OfficeDTO>($"{newDoctor.OfficeId}");
 
-        await _repositoryManager.SaveAsync();
-        
-        return doctorResult;
+            _repositoryManager.DoctorsRepository.Create(newDoctorEnity);
+
+            await _repositoryManager.SaveAsync();
+
+            var doctorResult = _mapper.Map<DoctorResponseDTO>(newDoctorEnity);
+
+            doctorResult.Office = office;
+
+            return doctorResult;
+        }
+        catch (Exception)
+        {
+            throw new Exception("Something went wrong during the request to OfficeAPI");
+        }
     }
 
-    public async Task<List<DoctorResponseDTO>> GetAllDoctorsAsync(DoctorsQueryParameters parameters,bool trackChanges)
+    public async Task<List<DoctorResponseDTO>> GetAllDoctorsAsync(DoctorsQueryParameters queryParameters, bool trackChanges)
     {
         var doctors = await _repositoryManager.DoctorsRepository
-            .GetAllAsync(parameters.SpecializationId, parameters.SearchLastName, trackChanges);
+            .GetAllAsync(queryParameters, trackChanges);
 
         if (doctors.IsNullOrEmpty())
         {
             throw new NotFoundException("There are not doctors in the database.");
         }
 
-        IEnumerable<string> officesIds = doctors.Select(x => x.OfficeId).Distinct().ToList();
-
-        string stringWithOfficesIds = string.Join(',', officesIds);
-
-        var offices = await _httpClient.GetFromJsonAsync<List<Office>>($"collection/({stringWithOfficesIds})");
-
-        foreach (var doctor in doctors)
-        {
-            doctor.Office = offices.FirstOrDefault(x => x.OfficeId.Equals(doctor.OfficeId));
-        }
-
         var mappedDoctors = _mapper.Map<List<DoctorResponseDTO>>(doctors);
+
+        try
+        {
+            IEnumerable<string> officesIds = doctors.Select(x => x.OfficeId).Distinct().ToList();
+
+            string stringWithOfficesIds = string.Join(',', officesIds);
+
+            var offices = await _httpClient.GetFromJsonAsync<List<OfficeDTO>>($"collection/({stringWithOfficesIds})");
+
+            foreach (var doctor in mappedDoctors)
+            {
+                doctor.Office = offices.First(x => x.OfficeId.Equals(doctor.Office.OfficeId));
+            }
+        }
+        catch(Exception)
+        {
+            throw new Exception("Something went wrong during the request to OfficeAPI");
+        }
 
         return mappedDoctors;
     }
 
-    public async Task<DoctorResponseDTO> GetDoctorByIdAsync(Guid doctorId, bool trackChanges)
+    public async Task<DoctorResponseDTO?> GetDoctorByIdAsync(Guid id, bool trackChanges)
     {
-        var doctor = await _repositoryManager.DoctorsRepository.GetByIdAsync(doctorId, trackChanges);
+        var doctor = await _repositoryManager.DoctorsRepository.GetByIdAsync(id, trackChanges);
 
         if (doctor is null)
         {
-            throw new NotFoundException($"Doctor with id: {doctorId} was not found.");
+            throw new NotFoundException($"Doctor with id: {id} was not found.");
         }
 
-        doctor.Office = await _httpClient.GetFromJsonAsync<Office>($"{doctor.OfficeId}");
-
         var mappedDoctor = _mapper.Map<DoctorResponseDTO>(doctor);
+
+        try
+        {
+            var office = await _httpClient.GetFromJsonAsync<OfficeDTO>($"{doctor.OfficeId}");
+
+            mappedDoctor.Office = office;
+        }
+        catch (Exception)
+        {
+            throw new Exception("Something went wrong during the request to OfficeAPI");
+        }
 
         return mappedDoctor;
     }
 
-    public async Task UpdateDoctorAsync(Guid doctorId, DoctorUpdateDTO updatedDoctor)
+    public async Task UpdateDoctorAsync(Guid id, DoctorUpdateDTO updatedDoctor)
     {
-        var doctorEntity = await _repositoryManager.DoctorsRepository.GetByIdAsync(doctorId, true);
+        var doctorEntity = await _repositoryManager.DoctorsRepository.GetByIdAsync(id, true);
 
         if (doctorEntity is null)
         {
-            throw new NotFoundException("");
+            throw new NotFoundException($"The doctor with id: {id} was not found in the database.");
         }
 
-        _mapper.Map(updatedDoctor.PersonalInfo, doctorEntity.Account.PersonalInfo);
-        doctorEntity.OfficeId = updatedDoctor.OfficeId;
+        _mapper.Map(updatedDoctor, doctorEntity);
+
+        await _repositoryManager.SaveAsync();
+    }
+
+    public async Task DeleteDoctorAsync(Guid id)
+    {
+        var doctorEntity = await _repositoryManager.DoctorsRepository.GetByIdAsync(id, true);
+
+        _repositoryManager.AccountsRepository.Delete(doctorEntity.Account);
 
         await _repositoryManager.SaveAsync();
     }

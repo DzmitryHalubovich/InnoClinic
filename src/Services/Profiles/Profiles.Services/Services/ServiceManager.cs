@@ -17,10 +17,12 @@ public class ServiceManager : IServiceManager
         _patientsService = new Lazy<IPatientsService>(() => new
             PatientsService(repositoryManager, mapper));
         _receptionistsService = new Lazy<IReceptionistsService>(() => new
-            ReceptionistsService(repositoryManager, mapper));
+            ReceptionistsService(repositoryManager, mapper, factory));
     }
 
     public IDoctorsService DoctorsService => _doctorsService.Value;
+
     public IPatientsService PatientsService => _patientsService.Value;
+
     public IReceptionistsService ReceptionistsService => _receptionistsService.Value;
 }

@@ -16,11 +16,8 @@ public class OfficesController : ControllerBase
 {
     private readonly IOfficesService _officesService;
 
-    public OfficesController(IOfficesService officesService)
-    {
+    public OfficesController(IOfficesService officesService) =>
         _officesService = officesService;
-    }
-
 
     /// <summary>
     /// Returns list of offices
@@ -145,7 +142,6 @@ public class OfficesController : ControllerBase
         return Ok(office);
     }
 
-
     /// <summary>
     /// Add new office to the database
     /// </summary>
@@ -184,7 +180,6 @@ public class OfficesController : ControllerBase
         return BadRequest(validationResult);
     }
 
-
     /// <summary>
     /// Deletes the office by the specified id
     /// </summary>
@@ -210,7 +205,6 @@ public class OfficesController : ControllerBase
 
         return NoContent();
     }
-
 
     /// <summary>
     /// Update office by the specified id

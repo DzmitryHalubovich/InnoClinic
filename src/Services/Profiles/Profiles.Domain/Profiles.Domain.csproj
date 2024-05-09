@@ -19,4 +19,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Profiles.Contracts\Profiles.Contracts.csproj" />
+    <ProjectReference Include="..\Profiles.Services.Abstractions\Profiles.Services.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
