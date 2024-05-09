@@ -7,6 +7,9 @@ using Profiles.Services.Abstractions;
 
 namespace Profiles.Presentation.Controllers;
 
+/// <summary>
+/// Doctors controller
+/// </summary>
 [ApiController]
 [Route("api/doctors")]
 public class DoctorsController : ControllerBase
@@ -19,7 +22,6 @@ public class DoctorsController : ControllerBase
     /// <summary>
     /// Returns list of doctors
     /// </summary>
-    /// <remarks>
     /// <param name="parameters">Doctor's full name for searching</param>
     /// <returns>List of doctors in the database</returns>
     /// <response code="200">Returns doctors successfully</response>
@@ -38,7 +40,6 @@ public class DoctorsController : ControllerBase
     /// <summary>
     /// Returns doctor by provided id
     /// </summary>
-    /// <remarks>
     /// <param name="id"></param>
     /// <returns></returns>
     /// <response code="200">Returns doctor successfully</response>

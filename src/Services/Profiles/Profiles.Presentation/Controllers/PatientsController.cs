@@ -56,7 +56,7 @@ public class PatientsController : ControllerBase
     /// <param name="validator"></param>
     /// <param name="newPatient"></param>
     /// <response code="201">Returns if patient was created</response>
-    /// <response code="400">Returns if entity was invalid/response>
+    /// <response code="400">Returns if entity was invalid</response>
     [HttpPost]
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]

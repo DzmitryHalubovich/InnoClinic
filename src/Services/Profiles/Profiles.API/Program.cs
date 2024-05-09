@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Profiles.API.Extensions;
 using Profiles.Contracts.DTOs.Doctor;
 using Profiles.Contracts.DTOs.Patient;
@@ -11,6 +12,7 @@ using Profiles.Presentation.Validators;
 using Profiles.Services.Abstractions;
 using Profiles.Services.Services;
 using Serilog;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,4 +69,11 @@ void ConfigureServices(IServiceCollection services)
         .AddApplicationPart(typeof(Profiles.Presentation.Controllers.DoctorsController).Assembly);
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
+    services.AddSwaggerGen(options =>
+    {
+        options.SwaggerDoc("v1", new OpenApiInfo { Title = "ProfilesAPI", Version = "v1" });
+
+        var xmlFilename = Path.Combine(AppContext.BaseDirectory, "Profiles.Presentation.xml");
+        options.IncludeXmlComments(xmlFilename);
+    });
 }

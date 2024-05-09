@@ -16,7 +16,6 @@ public class PatientCreateValidator : AbstractValidator<PatientCreateDTO>
             .MaximumLength(100).WithMessage("LastName field should contain 100 or less simbols.")
             .MinimumLength(1).WithMessage("LastName field should contain at least 1 simbol.");
         RuleFor(x => x.MiddleName)
-            .NotEmpty()
             .MinimumLength(1)
             .MaximumLength(100);
         RuleFor(x => x.PhoneNumber)
