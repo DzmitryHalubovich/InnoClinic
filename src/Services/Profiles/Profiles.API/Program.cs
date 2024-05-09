@@ -12,7 +12,6 @@ using Profiles.Presentation.Validators;
 using Profiles.Services.Abstractions;
 using Profiles.Services.Services;
 using Serilog;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 

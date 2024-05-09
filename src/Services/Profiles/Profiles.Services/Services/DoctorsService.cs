@@ -38,38 +38,30 @@ public class DoctorsService : IDoctorsService
         _repositoryManager.AccountsRepository.Create(newAccount);
 
         var status = _mapper.Map<Status>(newDoctor.Status);
-        
-        var newDoctorEnity = new Doctor()
-        {
-            Account = newAccount,
-            OfficeId = newDoctor.OfficeId,
-            FirstName = newDoctor.FirstName,
-            LastName = newDoctor.LastName,
-            MiddleName = newDoctor.MiddleName,
-            DateOfBirth = newDoctor.DateOfBirth,
-            SpecializationId = newDoctor.SpecializationId,
-            CareerStartYear = DateTime.Now,
-            Status = status,
-        };
+
+        var newDoctorEntity = _mapper.Map<Doctor>(newDoctor);
+
+        newDoctorEntity.Account = newAccount;
+        newDoctorEntity.Status = status;
+
+        var doctorResult = _mapper.Map<DoctorResponseDTO>(newDoctorEntity);
+
+        _repositoryManager.DoctorsRepository.Create(newDoctorEntity);
+
+        await _repositoryManager.SaveAsync();
 
         try
         {
             var office = await _httpClient.GetFromJsonAsync<OfficeDTO>($"{newDoctor.OfficeId}");
 
-            _repositoryManager.DoctorsRepository.Create(newDoctorEnity);
-
-            await _repositoryManager.SaveAsync();
-
-            var doctorResult = _mapper.Map<DoctorResponseDTO>(newDoctorEnity);
-
             doctorResult.Office = office;
-
-            return doctorResult;
         }
         catch (Exception)
         {
             throw new Exception("Something went wrong during the request to OfficeAPI");
         }
+            
+        return doctorResult;
     }
 
     public async Task<List<DoctorResponseDTO>> GetAllDoctorsAsync(DoctorsQueryParameters queryParameters, bool trackChanges)
