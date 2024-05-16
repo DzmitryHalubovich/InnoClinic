@@ -102,15 +102,14 @@ public class DoctorsController : ControllerBase
     {
         var validationResult = validator.Validate(editedDotctor);
 
-        if (!validationResult.IsValid)
+        if (validationResult.IsValid)
         {
-            return BadRequest(validationResult.ToDictionary());
+            var updateDoctorResult = await _serviceManager.DoctorsService.UpdateDoctorAsync(id, editedDotctor);
+
+            return updateDoctorResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
         }
 
-        var doctorUpdateResult = await _serviceManager.DoctorsService.UpdateDoctorAsync(id, editedDotctor);
-
-        return doctorUpdateResult.Match<IActionResult>(success => NoContent(), 
-            notFound => NotFound());
+        return BadRequest(validationResult.ToDictionary());
     }
 
     /// <summary>
@@ -126,8 +125,8 @@ public class DoctorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
-        var doctorDeleteResult = await _serviceManager.DoctorsService.DeleteDoctorAsync(id);
+        var deleteDoctorResult = await _serviceManager.DoctorsService.DeleteDoctorAsync(id);
 
-        return doctorDeleteResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
+        return deleteDoctorResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }
 }

@@ -27,9 +27,9 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllReceptionists()
     {
-        var receptionists = await _serviceManager.ReceptionistsService.GetAllReceptionistsAsync(false);
+        var getReceptionistsResult = await _serviceManager.ReceptionistsService.GetAllReceptionistsAsync(false);
 
-        return Ok(receptionists);
+        return getReceptionistsResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     /// <summary>
@@ -45,9 +45,9 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var receptionist = await _serviceManager.ReceptionistsService.GetReceptionistByIdAsync(id, false);
+        var getReceptionistResult = await _serviceManager.ReceptionistsService.GetReceptionistByIdAsync(id, false);
 
-        return Ok(receptionist);
+        return getReceptionistResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     /// <summary>
@@ -98,9 +98,10 @@ public class ReceptionistsController : ControllerBase
 
         if (validationResult.IsValid)
         {
-            await _serviceManager.ReceptionistsService.UpdateReceptionistAsync(id, updatedReceptionist);
+            var updateReceptionistResult =
+                await _serviceManager.ReceptionistsService.UpdateReceptionistAsync(id, updatedReceptionist);
 
-            return NoContent();
+            return updateReceptionistResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
         }
 
         return BadRequest(validationResult.ToDictionary());
@@ -119,8 +120,8 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteReceptionist(Guid id)
     {
-        await _serviceManager.ReceptionistsService.DeleteReceptionistAsync(id);
+        var deleteReceptionistResult = await _serviceManager.ReceptionistsService.DeleteReceptionistAsync(id);
 
-        return NoContent();
+        return deleteReceptionistResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }
 }

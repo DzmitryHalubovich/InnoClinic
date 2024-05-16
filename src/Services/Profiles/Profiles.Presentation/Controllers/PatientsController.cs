@@ -96,15 +96,15 @@ public class PatientsController : ControllerBase
     {
         var validationResult = validator.Validate(patientUpdate);
 
-        if (!validationResult.IsValid)
+        if (validationResult.IsValid)
         {
-            return BadRequest(validationResult.ToDictionary());
+            var updatePatientResult =
+                await _serviceManager.PatientsService.UpdatePatientAsync(id, patientUpdate);
+
+            return updatePatientResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
         }
 
-        var updatePatientResult = 
-            await _serviceManager.PatientsService.UpdatePatientAsync(id, patientUpdate);
-
-        return updatePatientResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
+        return BadRequest(validationResult.ToDictionary());
     }
 
     /// <summary>
