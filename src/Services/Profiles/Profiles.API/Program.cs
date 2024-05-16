@@ -59,13 +59,13 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IValidator<PatientUpdateDTO>, PatientUpdateValidator>();    
     services.AddScoped<IValidator<ReceptionistCreateDTO>, ReceptionistCreateValidator>();
     services.AddScoped<IValidator<ReceptionistUpdateDTO>, ReceptionistUpdateValidator>();
-    services.AddScoped<IRepositoryManager, RepositoryManager>();
-    services.AddScoped<IServiceManager, ServiceManager>();
     services.AddScoped<IDoctorsService, DoctorsService>();
     services.AddScoped<IPatientsService, PatientsService>();
+    services.AddScoped<IReceptionistsService, ReceptionistsService>();
     services.AddScoped<IDoctorsRepository, DoctorsRepository>();
     services.AddScoped<IAccountsRepository, AccountRepository>();
     services.AddScoped<IPatientsRepository, PatientsRepository>();
+    services.AddScoped<IReceptionistsRepository, ReceptionistsRepository>();
     services.AddAutoMapper(typeof(MapperProfile));
     services.AddHttpClient();
     services.AddDbContext<ProfilesDbContext>(opt =>

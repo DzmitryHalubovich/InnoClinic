@@ -13,22 +13,23 @@ namespace Profiles.Services.Services;
 
 public class DoctorsService : IDoctorsService
 {
-    private readonly IRepositoryManager _repositoryManager;
+    private readonly IAccountsRepository _accountsRepository;
+    private readonly IDoctorsRepository _doctorsRepository;
     private readonly IMapper _mapper;
     private readonly IHttpRepository<OfficeDTO> _httpRepository;
 
-    public DoctorsService(IRepositoryManager repositoryManager,
-        IMapper mapper, IHttpRepository<OfficeDTO> httpRepository)
+    public DoctorsService(IAccountsRepository accountsRepository, IDoctorsRepository doctorsRepository,
+        IHttpRepository<OfficeDTO> httpRepository, IMapper mapper)
     {
-        _repositoryManager = repositoryManager;
-        _mapper = mapper;
+        _accountsRepository = accountsRepository;
+        _doctorsRepository = doctorsRepository;
         _httpRepository = httpRepository;
+        _mapper = mapper;
     }
 
     public async Task<OneOf<List<DoctorResponseDTO>, NotFound>> GetAllDoctorsAsync(DoctorsQueryParameters queryParameters, bool trackChanges)
     {
-        var doctors = await _repositoryManager.DoctorsRepository
-            .GetAllAsync(queryParameters, trackChanges);
+        var doctors = await _doctorsRepository.GetAllAsync(queryParameters, trackChanges);
 
         if (doctors.IsNullOrEmpty())
         {
@@ -51,7 +52,7 @@ public class DoctorsService : IDoctorsService
 
     public async Task<OneOf<DoctorResponseDTO, NotFound>> GetDoctorByIdAsync(Guid id, bool trackChanges)
     {
-        var doctor = await _repositoryManager.DoctorsRepository.GetByIdAsync(id, trackChanges);
+        var doctor = await _doctorsRepository.GetByIdAsync(id, trackChanges);
 
         if (doctor is null)
         {
@@ -68,28 +69,19 @@ public class DoctorsService : IDoctorsService
     
     public async Task<DoctorResponseDTO> CreateDoctorAsync(DoctorCreateDTO newDoctor)
     {
-        var newAccount = new Account()
+        var newDoctorEntity = _mapper.Map<Doctor>(newDoctor);
+
+        newDoctorEntity.Account = new Account()
         {
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             Email = newDoctor.Email,
         };
 
-        _repositoryManager.AccountsRepository.Create(newAccount);
-
-        var status = _mapper.Map<Status>(newDoctor.Status);
-
-        var newDoctorEntity = _mapper.Map<Doctor>(newDoctor);
-
-        newDoctorEntity.Account = newAccount;
-        newDoctorEntity.Status = status;
+        await _doctorsRepository.CreateAsync(newDoctorEntity);
 
         var doctorResult = _mapper.Map<DoctorResponseDTO>(newDoctorEntity);
-
-        _repositoryManager.DoctorsRepository.Create(newDoctorEntity);
-
-        await _repositoryManager.SaveAsync();
-
+        
         doctorResult.Office = await _httpRepository.GetOneAsync("https://localhost:7255/api/offices", newDoctorEntity.OfficeId!);
             
         return doctorResult;
@@ -97,7 +89,7 @@ public class DoctorsService : IDoctorsService
 
     public async Task<OneOf<Success, NotFound>> UpdateDoctorAsync(Guid id, DoctorUpdateDTO updatedDoctor)
     {
-        var doctorEntity = await _repositoryManager.DoctorsRepository.GetByIdAsync(id, true);
+        var doctorEntity = await _doctorsRepository.GetByIdAsync(id, false);
 
         if (doctorEntity is null)
         {
@@ -106,23 +98,21 @@ public class DoctorsService : IDoctorsService
 
         _mapper.Map(updatedDoctor, doctorEntity);
 
-        await _repositoryManager.SaveAsync();
+        await _doctorsRepository.UpdateAsync(doctorEntity);
 
         return new Success();
     }
 
     public async Task<OneOf<Success, NotFound>> DeleteDoctorAsync(Guid id)
     {
-        var doctorEntity = await _repositoryManager.DoctorsRepository.GetByIdAsync(id, true);
+        var doctorEntity = await _doctorsRepository.GetByIdAsync(id, true);
 
         if (doctorEntity is null)
         {
             return new NotFound();
         }
 
-        _repositoryManager.AccountsRepository.Delete(doctorEntity.Account);
-
-        await _repositoryManager.SaveAsync();
+        await _accountsRepository.DeleteAsync(doctorEntity.Account);
 
         return new Success();
     }

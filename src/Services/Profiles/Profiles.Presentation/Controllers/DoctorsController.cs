@@ -14,10 +14,10 @@ namespace Profiles.Presentation.Controllers;
 [Route("api/doctors")]
 public class DoctorsController : ControllerBase
 {
-    private readonly IServiceManager _serviceManager;
+    private readonly IDoctorsService _doctorService;
 
-    public DoctorsController(IServiceManager serviceManager) => 
-        _serviceManager = serviceManager;
+    public DoctorsController(IDoctorsService doctorService) =>
+        _doctorService = doctorService;
 
     /// <summary>
     /// Returns list of doctors
@@ -32,7 +32,7 @@ public class DoctorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllDoctors([FromQuery] DoctorsQueryParameters parameters)
     {
-        var getDoctorsResult = await _serviceManager.DoctorsService.GetAllDoctorsAsync(parameters,false);
+        var getDoctorsResult = await _doctorService.GetAllDoctorsAsync(parameters,false);
 
         return getDoctorsResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -50,7 +50,7 @@ public class DoctorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var getDoctorResult = await _serviceManager.DoctorsService.GetDoctorByIdAsync(id, false);
+        var getDoctorResult = await _doctorService.GetDoctorByIdAsync(id, false);
 
         return getDoctorResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -74,7 +74,7 @@ public class DoctorsController : ControllerBase
 
         if (validationResult.IsValid)
         {
-            var createdDoctor = await _serviceManager.DoctorsService.CreateDoctorAsync(newDoctor);
+            var createdDoctor = await _doctorService.CreateDoctorAsync(newDoctor);
 
             return CreatedAtRoute("GetDoctorById", new { createdDoctor.Id }, createdDoctor);
         }
@@ -104,7 +104,7 @@ public class DoctorsController : ControllerBase
 
         if (validationResult.IsValid)
         {
-            var updateDoctorResult = await _serviceManager.DoctorsService.UpdateDoctorAsync(id, editedDotctor);
+            var updateDoctorResult = await _doctorService.UpdateDoctorAsync(id, editedDotctor);
 
             return updateDoctorResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
         }
@@ -125,7 +125,7 @@ public class DoctorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
-        var deleteDoctorResult = await _serviceManager.DoctorsService.DeleteDoctorAsync(id);
+        var deleteDoctorResult = await _doctorService.DeleteDoctorAsync(id);
 
         return deleteDoctorResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }

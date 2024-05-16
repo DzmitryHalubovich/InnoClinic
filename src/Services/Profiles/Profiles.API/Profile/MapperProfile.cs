@@ -14,11 +14,11 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Experience, 
             opt => opt.MapFrom(src => DateTime.Now.AddYears(1).AddYears(-src.CareerStartYear.Year).Year));
 
-        CreateMap<DoctorCreateDTO, Doctor>();
+        CreateMap<DoctorCreateDTO, Doctor>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (Status)src.Status));
 
         CreateMap<DoctorUpdateDTO, Doctor>();
 
-        CreateMap<StatusDTO, Status>();
         #endregion
 
         #region Patient
@@ -33,6 +33,8 @@ public class MapperProfile : Profile
         #endregion
 
         #region Receptionist
+        CreateMap<ReceptionistCreateDTO, Receptionist>();
+
         CreateMap<Receptionist, ReceptionistResponseDTO>()
             .ForPath(dest => dest.Office.OfficeId, opt => opt.MapFrom(src => src.OfficeId));
 

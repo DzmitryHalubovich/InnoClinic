@@ -9,7 +9,9 @@ public interface IDoctorsRepository
 
     public Task<Doctor?> GetByIdAsync(Guid id, bool trackChanges);
 
-    public void Create(Doctor newDoctor);
+    public Task CreateAsync(Doctor doctor);
 
-    public void Delete(Doctor doctor);
+    public Task UpdateAsync(Doctor doctor);
+
+    public Task DeleteAsync(Doctor doctor);
 }

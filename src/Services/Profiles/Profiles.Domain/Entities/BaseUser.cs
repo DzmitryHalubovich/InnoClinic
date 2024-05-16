@@ -28,5 +28,5 @@ public class BaseUser
     [Required]
     [ForeignKey(nameof(Account))]
     public Guid AccountId { get; set; }
-    public Account Account { get; set; } 
+    public Account Account { get; set; }
 }

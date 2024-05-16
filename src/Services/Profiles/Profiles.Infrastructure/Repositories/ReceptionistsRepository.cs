@@ -26,9 +26,24 @@ public class ReceptionistsRepository : IReceptionistsRepository
         : await _context.Receptionists.Include(r => r.Account)
                                       .FirstOrDefaultAsync(r => r.Id.Equals(receptionistId));
 
-    public void Create(Receptionist newReceptionist) =>
+    public async Task CreateAsync(Receptionist newReceptionist)
+    {
         _context.Receptionists.Add(newReceptionist);
 
-    public void Delete(Receptionist receptionist) =>
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Receptionist receptionist)
+    {
+        _context.Receptionists.Update(receptionist);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Receptionist receptionist)
+    {
         _context.Receptionists.Remove(receptionist);
+
+        await _context.SaveChangesAsync();
+    }
 }

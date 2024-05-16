@@ -10,10 +10,10 @@ namespace Profiles.Presentation.Controllers;
 [Route("api/receptionists")]
 public class ReceptionistsController : ControllerBase
 {
-    private readonly IServiceManager _serviceManager;
+    private readonly IReceptionistsService _receptionistsService;
 
-    public ReceptionistsController(IServiceManager serviceManager) =>
-        _serviceManager = serviceManager;
+    public ReceptionistsController(IReceptionistsService receptionistsService) =>
+        _receptionistsService = receptionistsService;
 
     /// <summary>
     /// Returns list of receptionists
@@ -27,7 +27,7 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllReceptionists()
     {
-        var getReceptionistsResult = await _serviceManager.ReceptionistsService.GetAllReceptionistsAsync(false);
+        var getReceptionistsResult = await _receptionistsService.GetAllReceptionistsAsync(false);
 
         return getReceptionistsResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -45,7 +45,7 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var getReceptionistResult = await _serviceManager.ReceptionistsService.GetReceptionistByIdAsync(id, false);
+        var getReceptionistResult = await _receptionistsService.GetReceptionistByIdAsync(id, false);
 
         return getReceptionistResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -69,7 +69,7 @@ public class ReceptionistsController : ControllerBase
 
         if (validationResult.IsValid)
         {
-            var createdReceptionist = await _serviceManager.ReceptionistsService.CreateReceptionistAsync(newRecepionist);
+            var createdReceptionist = await _receptionistsService.CreateReceptionistAsync(newRecepionist);
 
             return CreatedAtRoute("GetReceptionistById", new { createdReceptionist.Id }, createdReceptionist);
         }
@@ -99,7 +99,7 @@ public class ReceptionistsController : ControllerBase
         if (validationResult.IsValid)
         {
             var updateReceptionistResult =
-                await _serviceManager.ReceptionistsService.UpdateReceptionistAsync(id, updatedReceptionist);
+                await _receptionistsService.UpdateReceptionistAsync(id, updatedReceptionist);
 
             return updateReceptionistResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
         }
@@ -120,7 +120,7 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteReceptionist(Guid id)
     {
-        var deleteReceptionistResult = await _serviceManager.ReceptionistsService.DeleteReceptionistAsync(id);
+        var deleteReceptionistResult = await _receptionistsService.DeleteReceptionistAsync(id);
 
         return deleteReceptionistResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }

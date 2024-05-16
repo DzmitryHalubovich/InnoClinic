@@ -14,10 +14,10 @@ public class DoctorResponseDTO()
 
     public int Experience { get; set; }
 
-    public StatusDTO Status { get; set; } 
+    public int Status { get; set; } 
 
     public OfficeDTO? Office { get; set; }
 
-    public  Guid SpecializationId { get; set; }
+    public int SpecializationId { get; set; }
 }
 

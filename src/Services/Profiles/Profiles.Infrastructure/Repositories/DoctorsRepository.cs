@@ -12,9 +12,6 @@ public class DoctorsRepository : IDoctorsRepository
     public DoctorsRepository(ProfilesDbContext context) => 
         _context = context;
 
-    public void Create(Doctor newDoctor) => 
-        _context.Doctors.Add(newDoctor);
-
     public async Task<List<Doctor>> GetAllAsync(DoctorsQueryParameters queryParameters, bool trackChanges) => !trackChanges
         ? await _context.Doctors.AsNoTracking()
                                 .FilterDoctorsBySpecialization(queryParameters.SpecializationId)
@@ -33,6 +30,24 @@ public class DoctorsRepository : IDoctorsRepository
         : await _context.Doctors.Include(d => d.Account)
                                 .FirstOrDefaultAsync(d => d.Id.Equals(id));
 
-    public void Delete(Doctor doctor) =>
+    public async Task CreateAsync(Doctor doctor)
+    {
+        _context.Doctors.Add(doctor);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Doctor doctor)
+    {
+        _context.Doctors.Update(doctor);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Doctor doctor)
+    {
         _context.Doctors.Remove(doctor);
+
+        await _context.SaveChangesAsync();
+    }
 }

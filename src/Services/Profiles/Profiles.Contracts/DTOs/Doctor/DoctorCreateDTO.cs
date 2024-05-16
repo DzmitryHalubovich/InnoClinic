@@ -15,11 +15,11 @@ public class DoctorCreateDTO
     [EmailAddress]
     public string Email { get; set; } = null!;
 
-    public Guid SpecializationId { get; set; }
+    public int SpecializationId { get; set; }
 
     public string OfficeId { get; set; } = null!;
 
     public DateTime CareerStartYear { get; set; }
 
-    public StatusDTO Status { get; set; }
+    public int Status { get; set; }
 }

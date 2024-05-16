@@ -16,5 +16,5 @@ public class DoctorUpdateDTO
 
     public DateTime CareerStartYear { get; set; }
 
-    public StatusDTO Status { get; set; }
+    public int Status { get; set; }
 }

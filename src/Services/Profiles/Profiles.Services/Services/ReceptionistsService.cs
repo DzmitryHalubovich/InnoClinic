@@ -12,21 +12,24 @@ namespace Profiles.Services.Services;
 
 public class ReceptionistsService : IReceptionistsService
 {
-    private readonly IRepositoryManager _repositoryManager;
-    private readonly IMapper _mapper;
+    private readonly IAccountsRepository _accountsRepository;
+    private readonly IReceptionistsRepository _receptionistsRepository;
     private readonly IHttpRepository<OfficeDTO> _httpRepository;
+    private readonly IMapper _mapper;
 
-    public ReceptionistsService(IRepositoryManager repositoryManager, 
-        IMapper mapper, IHttpRepository<OfficeDTO> httpRepository)
+    public ReceptionistsService(IReceptionistsRepository receptionistsRepository, 
+        IMapper mapper, IHttpRepository<OfficeDTO> httpRepository, IAccountsRepository accountsRepository)
     {
-        _repositoryManager = repositoryManager;
+        _receptionistsRepository = receptionistsRepository;
         _mapper = mapper;
         _httpRepository = httpRepository;
+        _accountsRepository = accountsRepository;
+
     }
 
     public async Task<OneOf<List<ReceptionistResponseDTO>, NotFound>> GetAllReceptionistsAsync(bool trackChanges)
     {
-        var receptionists = await _repositoryManager.ReceptionistsRepository.GetAllAsync(trackChanges);
+        var receptionists = await _receptionistsRepository.GetAllAsync(trackChanges);
 
         if (receptionists.IsNullOrEmpty())
         {
@@ -49,7 +52,7 @@ public class ReceptionistsService : IReceptionistsService
 
     public async Task<OneOf<ReceptionistResponseDTO, NotFound>> GetReceptionistByIdAsync(Guid id, bool trackChanges)
     {
-        var receptionist = await _repositoryManager.ReceptionistsRepository.GetByIdAsync(id, trackChanges);
+        var receptionist = await _receptionistsRepository.GetByIdAsync(id, trackChanges);
 
         if (receptionist is null)
         {
@@ -58,36 +61,25 @@ public class ReceptionistsService : IReceptionistsService
 
         var mappedReceptionist = _mapper.Map<ReceptionistResponseDTO>(receptionist);
 
-            mappedReceptionist.Office = 
-                await _httpRepository.GetOneAsync("https://localhost:7255/api/offices", receptionist.OfficeId!);
+        mappedReceptionist.Office = 
+            await _httpRepository.GetOneAsync("https://localhost:7255/api/offices", receptionist.OfficeId!);
 
         return mappedReceptionist;
     }
 
     public async Task<ReceptionistResponseDTO> CreateReceptionistAsync(ReceptionistCreateDTO newReceptionist)
     {
-        var newAccount = new Account()
+        var newReceptionistEntity = _mapper.Map<Receptionist>(newReceptionist);
+
+        newReceptionistEntity.Account = new Account()
         {
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
             Email = newReceptionist.Email,
         };
-
-        _repositoryManager.AccountsRepository.Create(newAccount);
-
-        var newReceptionistEntity = new Receptionist()
-        {
-            Account = newAccount,
-            FirstName = newReceptionist.FirstName,
-            LastName = newReceptionist.LastName,
-            MiddleName = newReceptionist.MiddleName,
-            OfficeId = newReceptionist.OfficeId,
-        };
-
-        _repositoryManager.ReceptionistsRepository.Create(newReceptionistEntity);
-
-        await _repositoryManager.SaveAsync();
         
+        await _receptionistsRepository.CreateAsync(newReceptionistEntity);
+
         var receptionistResult = _mapper.Map<ReceptionistResponseDTO>(newReceptionistEntity);
 
         receptionistResult.Office =  
@@ -98,7 +90,7 @@ public class ReceptionistsService : IReceptionistsService
 
     public async Task<OneOf<Success, NotFound>> UpdateReceptionistAsync(Guid id, ReceptionistUpdateDTO updatedReceptionist)
     {
-        var receptionistEntity = await _repositoryManager.ReceptionistsRepository.GetByIdAsync(id, true);
+        var receptionistEntity = await _receptionistsRepository.GetByIdAsync(id, false);
 
         if (receptionistEntity is null)
         {
@@ -107,25 +99,21 @@ public class ReceptionistsService : IReceptionistsService
 
         _mapper.Map(updatedReceptionist, receptionistEntity);
 
-        receptionistEntity.OfficeId = updatedReceptionist.OfficeId;
-
-        await _repositoryManager.SaveAsync();
+        await _receptionistsRepository.UpdateAsync(receptionistEntity);
 
         return new Success();
     }
 
     public async Task<OneOf<Success, NotFound>> DeleteReceptionistAsync(Guid id)
     {
-        var receptionistEntity = await _repositoryManager.ReceptionistsRepository.GetByIdAsync(id, true);
+        var receptionistEntity = await _receptionistsRepository.GetByIdAsync(id, false);
 
         if (receptionistEntity is null)
         {
             return new NotFound();
         }
 
-        _repositoryManager.AccountsRepository.Delete(receptionistEntity.Account);
-
-        await _repositoryManager.SaveAsync();
+        await _accountsRepository.DeleteAsync(receptionistEntity.Account);
 
         return new Success();
     }

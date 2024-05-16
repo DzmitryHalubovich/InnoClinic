@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Profiles.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,7 +44,7 @@ namespace Profiles.Infrastructure.Migrations
                     Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
                     CareerStartYear = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: true),
-                    SpecializationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SpecializationId = table.Column<int>(type: "int", nullable: true),
                     IsLinkedToAccount = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
@@ -61,7 +61,8 @@ namespace Profiles.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Users_AccountId",
                 table: "Users",
-                column: "AccountId");
+                column: "AccountId",
+                unique: true);
         }
 
         /// <inheritdoc />

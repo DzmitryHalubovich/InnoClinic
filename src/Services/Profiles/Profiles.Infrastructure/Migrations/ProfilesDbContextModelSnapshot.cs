@@ -96,7 +96,8 @@ namespace Profiles.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("AccountId")
+                        .IsUnique();
 
                     b.ToTable("Users");
 
@@ -112,8 +113,8 @@ namespace Profiles.Infrastructure.Migrations
                     b.Property<DateTime>("CareerStartYear")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("SpecializationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("SpecializationId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -141,12 +142,17 @@ namespace Profiles.Infrastructure.Migrations
             modelBuilder.Entity("Profiles.Domain.Entities.BaseUser", b =>
                 {
                     b.HasOne("Profiles.Domain.Entities.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
+                        .WithOne("User")
+                        .HasForeignKey("Profiles.Domain.Entities.BaseUser", "AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Profiles.Domain.Entities.Account", b =>
+                {
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,9 +11,10 @@ public class AccountRepository : IAccountsRepository
     public AccountRepository(ProfilesDbContext context) =>
         _context = context;
 
-    public void Create(Account account) => 
-        _context.Accounts.Add(account);
-
-    public void Delete(Account account) => 
+    public async Task DeleteAsync(Account account)
+    {
         _context.Accounts.Remove(account);
+
+        await _context.SaveChangesAsync();
+    }
 }

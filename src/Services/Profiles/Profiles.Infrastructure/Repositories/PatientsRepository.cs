@@ -29,9 +29,24 @@ public class PatientsRepository : IPatientsRepository
         : await _context.Patients.Include(p => p.Account)
                                  .FirstOrDefaultAsync(p => p.Id.Equals(id));
 
-    public void Create(Patient newPatient) =>
+    public async Task CreateAsync(Patient newPatient)
+    {
         _context.Patients.Add(newPatient);
 
-    public void Delete(Patient patient) => 
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(Patient patient)
+    {
+        _context.Patients.Update(patient);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Patient patient)
+    {
         _context.Remove(patient);
+
+        await _context.SaveChangesAsync();
+    }
 }

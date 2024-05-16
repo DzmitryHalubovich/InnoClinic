@@ -9,7 +9,9 @@ public interface IPatientsRepository
 
     public Task<Patient?> GetByIdAsync(Guid id, bool trackChanges);
 
-    public void Create(Patient newPatient);
+    public Task CreateAsync(Patient patient);
 
-    public void Delete(Patient patient);
+    public Task UpdateAsync(Patient patient);
+
+    public Task DeleteAsync(Patient patient);
 }

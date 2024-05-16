@@ -27,4 +27,6 @@ public class Account
     public Guid? UpdatedBy { get; set; }
 
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+    public BaseUser? User { get; set; }
 }

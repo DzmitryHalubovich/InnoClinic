@@ -10,5 +10,5 @@ public class Doctor : BaseUser
     public Status Status { get; set; }
 
     [Required]
-    public Guid SpecializationId { get; set; }
+    public int SpecializationId { get; set; }
 }

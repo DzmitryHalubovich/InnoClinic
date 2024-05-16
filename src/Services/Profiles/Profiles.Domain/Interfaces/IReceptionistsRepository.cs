@@ -8,7 +8,9 @@ public interface IReceptionistsRepository
 
     public Task<Receptionist?> GetByIdAsync(Guid id, bool trackChanges);
 
-    public void Create(Receptionist newReceptionist);
+    public Task CreateAsync(Receptionist receptionist);
 
-    public void Delete(Receptionist receptionist);
+    public Task UpdateAsync(Receptionist receptionist);
+
+    public Task DeleteAsync(Receptionist receptionist);
 }
