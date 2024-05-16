@@ -32,9 +32,9 @@ public class DoctorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllDoctors([FromQuery] DoctorsQueryParameters parameters)
     {
-        var doctors = await _serviceManager.DoctorsService.GetAllDoctorsAsync(parameters,false);
+        var getDoctorsResult = await _serviceManager.DoctorsService.GetAllDoctorsAsync(parameters,false);
 
-        return Ok(doctors);
+        return getDoctorsResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     /// <summary>
@@ -50,9 +50,9 @@ public class DoctorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var doctor = await _serviceManager.DoctorsService.GetDoctorByIdAsync(id, false);
+        var getDoctorResult = await _serviceManager.DoctorsService.GetDoctorByIdAsync(id, false);
 
-        return Ok(doctor);
+        return getDoctorResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     /// <summary>
@@ -102,14 +102,15 @@ public class DoctorsController : ControllerBase
     {
         var validationResult = validator.Validate(editedDotctor);
 
-        if (validationResult.IsValid)
+        if (!validationResult.IsValid)
         {
-            await _serviceManager.DoctorsService.UpdateDoctorAsync(id, editedDotctor);
-
-            return NoContent();
+            return BadRequest(validationResult.ToDictionary());
         }
 
-        return BadRequest(validationResult.ToDictionary());
+        var doctorUpdateResult = await _serviceManager.DoctorsService.UpdateDoctorAsync(id, editedDotctor);
+
+        return doctorUpdateResult.Match<IActionResult>(success => NoContent(), 
+            notFound => NotFound());
     }
 
     /// <summary>
@@ -125,8 +126,8 @@ public class DoctorsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteDoctor([FromRoute] Guid id)
     {
-        await _serviceManager.DoctorsService.DeleteDoctorAsync(id);
+        var doctorDeleteResult = await _serviceManager.DoctorsService.DeleteDoctorAsync(id);
 
-        return NoContent();
+        return doctorDeleteResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }
 }

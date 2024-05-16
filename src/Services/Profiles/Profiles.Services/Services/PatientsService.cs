@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
+using OneOf;
+using OneOf.Types;
 using Profiles.Contracts.DTOs.Patient;
 using Profiles.Contracts.Pagination;
 using Profiles.Domain.Entities;
-using Profiles.Domain.Exceptions;
 using Profiles.Domain.Interfaces;
 using Profiles.Services.Abstractions;
 
@@ -20,13 +21,13 @@ public class PatientsService : IPatientsService
         _mapper = mapper;
     }
 
-    public async Task<List<PatientResponseDTO>> GetAllPatientsAsync(PatientsQueryParameters queryParameters, bool trackCahanges)
+    public async Task<OneOf<List<PatientResponseDTO>, NotFound>> GetAllPatientsAsync(PatientsQueryParameters queryParameters, bool trackCahanges)
     {
         var patients = await _repositoryManager.PatientsRepository.GetAllAsync(queryParameters, trackCahanges);
 
         if (patients.IsNullOrEmpty())
         {
-            throw new NotFoundException("There are not patients in the database.");
+            return new NotFound();
         }
 
         var mappedPatients = _mapper.Map<List<PatientResponseDTO>>(patients);
@@ -34,13 +35,13 @@ public class PatientsService : IPatientsService
         return mappedPatients;
     }
 
-    public async Task<PatientResponseDTO?> GetPatientByIdAsync(Guid id, bool trackChanges)
+    public async Task<OneOf<PatientResponseDTO, NotFound>> GetPatientByIdAsync(Guid id, bool trackChanges)
     {
         var patient = await _repositoryManager.PatientsRepository.GetByIdAsync(id, trackChanges);
 
         if (patient is null)
         {
-            throw new NotFoundException($"The patient with id: {id} was not found in the database.");
+            return new NotFound();
         }
 
         var mappedPatient = _mapper.Map<PatientResponseDTO>(patient);
@@ -77,26 +78,35 @@ public class PatientsService : IPatientsService
         return patientResult;
     }
 
-    public async Task UpdatePatientAsync(Guid id, PatientUpdateDTO updatedPatient)
+    public async Task<OneOf<Success, NotFound>> UpdatePatientAsync(Guid id, PatientUpdateDTO updatedPatient)
     {
         var patientEntity = await _repositoryManager.PatientsRepository.GetByIdAsync(id, true);
 
         if (patientEntity is null)
         {
-            throw new Exception();
+            return new NotFound();
         }
 
         _mapper.Map(updatedPatient, patientEntity);
 
         await _repositoryManager.SaveAsync();
+
+        return new Success();
     }
 
-    public async Task DeletePatientAsync(Guid id)
+    public async Task<OneOf<Success, NotFound>> DeletePatientAsync(Guid id)
     {
         var patientEntity = await _repositoryManager.PatientsRepository.GetByIdAsync(id, true);
+
+        if (patientEntity is null)
+        {
+            return new NotFound();
+        }
 
         _repositoryManager.AccountsRepository.Delete(patientEntity.Account);
 
         await _repositoryManager.SaveAsync();
+
+        return new Success();
     }
 }

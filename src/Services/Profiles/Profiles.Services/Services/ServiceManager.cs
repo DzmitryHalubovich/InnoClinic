@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Profiles.Contracts.DTOs.OuterServicesModels;
 using Profiles.Domain.Interfaces;
 using Profiles.Services.Abstractions;
 
@@ -10,14 +11,15 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<IPatientsService> _patientsService;
     private readonly Lazy<IReceptionistsService> _receptionistsService;
 
-    public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper, IHttpClientFactory factory)
+    public ServiceManager(IRepositoryManager repositoryManager, IMapper mapper, 
+        IHttpClientFactory factory, IHttpRepository<OfficeDTO> httpRepository)
     {
         _doctorsService = new Lazy<IDoctorsService>(() => new
-            DoctorsService(repositoryManager, mapper, factory));
+            DoctorsService(repositoryManager, mapper, httpRepository));
         _patientsService = new Lazy<IPatientsService>(() => new
             PatientsService(repositoryManager, mapper));
         _receptionistsService = new Lazy<IReceptionistsService>(() => new
-            ReceptionistsService(repositoryManager, mapper, factory));
+            ReceptionistsService(repositoryManager, mapper, httpRepository));
     }
 
     public IDoctorsService DoctorsService => _doctorsService.Value;

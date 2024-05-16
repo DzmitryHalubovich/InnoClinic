@@ -28,9 +28,9 @@ public class PatientsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllPatients([FromQuery] PatientsQueryParameters queryParameters)
     {
-        var patients = await _serviceManager.PatientsService.GetAllPatientsAsync(queryParameters, false);
+        var getPatientsResult = await _serviceManager.PatientsService.GetAllPatientsAsync(queryParameters, false);
 
-        return Ok(patients);
+        return getPatientsResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     /// <summary>
@@ -45,9 +45,9 @@ public class PatientsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPatientById(Guid id)
     {
-        var patient = await _serviceManager.PatientsService.GetPatientByIdAsync(id, false);
+        var getPatientResult = await _serviceManager.PatientsService.GetPatientByIdAsync(id, false);
 
-        return Ok(patient);
+        return getPatientResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     /// <summary>
@@ -96,14 +96,15 @@ public class PatientsController : ControllerBase
     {
         var validationResult = validator.Validate(patientUpdate);
 
-        if (validationResult.IsValid)
+        if (!validationResult.IsValid)
         {
-            await _serviceManager.PatientsService.UpdatePatientAsync(id, patientUpdate);
-
-            return NoContent();
+            return BadRequest(validationResult.ToDictionary());
         }
 
-        return BadRequest(validationResult.IsValid);
+        var updatePatientResult = 
+            await _serviceManager.PatientsService.UpdatePatientAsync(id, patientUpdate);
+
+        return updatePatientResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }
 
     /// <summary>
@@ -119,8 +120,8 @@ public class PatientsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeletePatient([FromRoute] Guid id)
     {
-        await _serviceManager.PatientsService.DeletePatientAsync(id);
+        var deletePatientResult = await _serviceManager.PatientsService.DeletePatientAsync(id);
 
-        return NoContent();
+        return deletePatientResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }
 }

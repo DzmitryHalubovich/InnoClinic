@@ -1,8 +1,11 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Polly;
+using Polly.Extensions.Http;
 using Profiles.API.Extensions;
 using Profiles.Contracts.DTOs.Doctor;
+using Profiles.Contracts.DTOs.OuterServicesModels;
 using Profiles.Contracts.DTOs.Patient;
 using Profiles.Contracts.DTOs.Receptionist;
 using Profiles.Domain.Interfaces;
@@ -47,6 +50,9 @@ app.Run();
 
 void ConfigureServices(IServiceCollection services)
 {
+    services.AddHttpClient<IHttpRepository<OfficeDTO>, HttpRepository<OfficeDTO>>()
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .AddPolicyHandler(GetRetryPolicy());
     services.AddScoped<IValidator<DoctorCreateDTO>, DoctorCreateValidator>();
     services.AddScoped<IValidator<DoctorUpdateDTO>, DoctorUpdateValidator>();
     services.AddScoped<IValidator<PatientCreateDTO>, PatientCreateValidator>();
@@ -75,4 +81,13 @@ void ConfigureServices(IServiceCollection services)
         var xmlFilename = Path.Combine(AppContext.BaseDirectory, "Profiles.Presentation.xml");
         options.IncludeXmlComments(xmlFilename);
     });
+}
+
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.NotFound)
+        .WaitAndRetryAsync(3, retryAtempt => 
+            TimeSpan.FromSeconds(Math.Pow(2, retryAtempt)));
 }
