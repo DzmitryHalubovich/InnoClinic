@@ -33,6 +33,7 @@ void ConfigureServices(IServiceCollection services)
 {
     services.AddAutoMapper(typeof(MapperProfile));
     services.AddScoped<IValidator<SpecializationCreateDTO>, SpecializationCreateValidator>();
+    services.AddScoped<IValidator<SpecializationUpdateDTO>, SpecializationUpdateValidator>();
     services.AddScoped<ISpecializationsService, SpecializationsService>();
     services.AddScoped<ISpecializationsRepository, SpecializationsRepository>();
     services.AddDbContext<ServicesDbContext>(opt =>

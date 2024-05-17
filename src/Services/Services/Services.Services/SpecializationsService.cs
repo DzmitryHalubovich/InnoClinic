@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using OneOf;
+using OneOf.Types;
 using Services.Contracts.Specialization;
 using Services.Domain.Entities;
 using Services.Domain.Interfaces;
@@ -17,18 +19,28 @@ public class SpecializationsService : ISpecializationsService
         _mapper = mapper;
     }
 
-    public async Task<List<SpecializationResponseDTO>> GetAllSpecializationsAsync()
+    public async Task<OneOf<List<SpecializationResponseDTO>, NotFound>> GetAllSpecializationsAsync()
     {
-        var specializationList = await _specializationRepository.GetAllAsync();
+        var specializationsList = await _specializationRepository.GetAllAsync();
 
-        var mappedspecializationList = _mapper.Map<List<SpecializationResponseDTO>>(specializationList);
+        if (!specializationsList.Any())
+        {
+            return new NotFound();
+        }
 
-        return mappedspecializationList;
+        var mappedSpecializationsList = _mapper.Map<List<SpecializationResponseDTO>>(specializationsList);
+
+        return mappedSpecializationsList;
     }
 
-    public async Task<SpecializationResponseDTO> GetSpecializationByIdAsync(int id)
+    public async Task<OneOf<SpecializationResponseDTO, NotFound>> GetSpecializationByIdAsync(int id)
     {
         var specializationEntity = await _specializationRepository.GetByIdAsync(id);
+
+        if (specializationEntity is null)
+        {
+            return new NotFound();
+        }
 
         var mappedSpecialization = _mapper.Map<SpecializationResponseDTO>(specializationEntity);
 
@@ -37,21 +49,41 @@ public class SpecializationsService : ISpecializationsService
 
     public async Task<SpecializationResponseDTO> CreateSpecializationAsync(SpecializationCreateDTO newSpecialization)
     {
-        var specialization = new Specialization()
+        var specialization = _mapper.Map<Specialization>(newSpecialization);
+
+/*        var specialization = new Specialization()
         {
             Name = newSpecialization.Name,
             Status = (Status)newSpecialization.Status
-        };
+        };*/
 
         await _specializationRepository.CreateAsync(specialization);
 
-        var specializationResult = new SpecializationResponseDTO()
+        var specializationResult = _mapper.Map<SpecializationResponseDTO>(specialization);
+
+        /*var specializationResult = new SpecializationResponseDTO()
         {
             Id = specialization.Id,
             Name = specialization.Name,
             Status = (int)specialization.Status
-        };
+        };*/
 
         return specializationResult;
+    }
+
+    public async Task<OneOf<Success, NotFound>> UpdateSpecializationAsync(int id, SpecializationUpdateDTO editedSpecialization)
+    {
+        var specializationEntity = await _specializationRepository.GetByIdAsync(id);
+
+        if (specializationEntity is null)
+        {
+            return new NotFound();
+        }
+
+        _mapper.Map(editedSpecialization, specializationEntity);
+
+        await _specializationRepository.UpdateAsync(specializationEntity);
+
+        return new Success();
     }
 }

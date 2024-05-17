@@ -19,27 +19,17 @@ public class SpecializationsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetSpecializations()
     {
-        var specResponse = await _specializationService.GetAllSpecializationsAsync();
+        var getSpecializationResponse = await _specializationService.GetAllSpecializationsAsync();
 
-        if (specResponse is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(specResponse);
+        return getSpecializationResponse.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     [HttpGet("{id}", Name = "GetSpecializationById")]
     public async Task<IActionResult> GetSpecializationById([FromRoute] int id)
     {
-        var specResponse = await _specializationService.GetSpecializationByIdAsync(id);
+        var getSpecializationResponse = await _specializationService.GetSpecializationByIdAsync(id);
 
-        if (specResponse is null)
-        {
-            return NotFound();
-        }
-
-        return Ok(specResponse);
+        return getSpecializationResponse.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
     [HttpPost]
@@ -60,8 +50,18 @@ public class SpecializationsController : ControllerBase
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateSpecialization([FromRoute] int id, 
-        [FromBody] SpecializationUpdateDTO editedSpecialization)
+        [FromBody] SpecializationUpdateDTO editedSpecialization, IValidator<SpecializationUpdateDTO> validator)
     {
-        return NoContent();
+        var validationResult = validator.Validate(editedSpecialization);
+
+        if (validationResult.IsValid)
+        {
+            var updateSpecializationResult = 
+                await _specializationService.UpdateSpecializationAsync(id, editedSpecialization);
+
+            return updateSpecializationResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
+        }
+
+        return BadRequest(validationResult.ToDictionary());
     }
 }

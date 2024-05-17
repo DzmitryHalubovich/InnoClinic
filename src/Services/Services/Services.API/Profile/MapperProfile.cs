@@ -9,5 +9,7 @@ public class MapperProfile : Profile
         CreateMap<SpecializationCreateDTO, Specialization>();
 
         CreateMap<Specialization, SpecializationResponseDTO>();
+
+        CreateMap<SpecializationUpdateDTO, Specialization>();
     }
 }

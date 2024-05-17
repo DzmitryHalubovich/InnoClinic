@@ -1,12 +1,16 @@
-﻿using Services.Contracts.Specialization;
+﻿using OneOf;
+using OneOf.Types;
+using Services.Contracts.Specialization;
 
 namespace Services.Services.Abstractions;
 
 public interface ISpecializationsService
 {
-    public Task<List<SpecializationResponseDTO>> GetAllSpecializationsAsync();
+    public Task<OneOf<List<SpecializationResponseDTO>, NotFound>> GetAllSpecializationsAsync();
 
-    public Task<SpecializationResponseDTO> GetSpecializationByIdAsync(int id);
+    public Task<OneOf<SpecializationResponseDTO, NotFound>> GetSpecializationByIdAsync(int id);
 
     public Task<SpecializationResponseDTO> CreateSpecializationAsync(SpecializationCreateDTO newSpecialization);
+
+    public Task<OneOf<Success, NotFound>> UpdateSpecializationAsync(int id, SpecializationUpdateDTO editedSpecialization);
 }
