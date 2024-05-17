@@ -1,0 +1,14 @@
+﻿using Services.Domain.Entities;
+
+namespace Services.Domain.Interfaces;
+
+public interface IServicesRepository
+{
+    public Task<List<Service>> GetAllActiveAsync();
+
+    public Task<Service?> GetByIdAsync(Guid id);
+
+    public Task CreateAsync(Service service);
+
+    public Task UpdateAsync(Service service);
+}

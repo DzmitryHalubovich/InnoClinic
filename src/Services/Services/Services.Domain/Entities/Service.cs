@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Services.Domain.Entities;
 
@@ -15,7 +16,12 @@ public class Service
 
     public Status Status { get; set; }
 
-    public int CategoryId { get; set; }
+
+    public int ServiceCategoryId { get; set; }
+
+    public ServiceCategory ServiceCategory { get; set; }
 
     public int SpecializationId { get; set; }
+
+    public Specialization Specialization { get; set; }
 }

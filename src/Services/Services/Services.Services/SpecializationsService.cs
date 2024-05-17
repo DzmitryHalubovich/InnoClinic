@@ -10,18 +10,18 @@ namespace Services.Services;
 
 public class SpecializationsService : ISpecializationsService
 {
-    private readonly ISpecializationsRepository _specializationRepository;
+    private readonly ISpecializationsRepository _specializationsRepository;
     private readonly IMapper _mapper;
 
     public SpecializationsService(ISpecializationsRepository specializationsRepository, IMapper mapper)
     {
-        _specializationRepository = specializationsRepository;
+        _specializationsRepository = specializationsRepository;
         _mapper = mapper;
     }
 
     public async Task<OneOf<List<SpecializationResponseDTO>, NotFound>> GetAllSpecializationsAsync()
     {
-        var specializationsList = await _specializationRepository.GetAllAsync();
+        var specializationsList = await _specializationsRepository.GetAllAsync();
 
         if (!specializationsList.Any())
         {
@@ -35,7 +35,7 @@ public class SpecializationsService : ISpecializationsService
 
     public async Task<OneOf<SpecializationResponseDTO, NotFound>> GetSpecializationByIdAsync(int id)
     {
-        var specializationEntity = await _specializationRepository.GetByIdAsync(id);
+        var specializationEntity = await _specializationsRepository.GetByIdAsync(id);
 
         if (specializationEntity is null)
         {
@@ -51,29 +51,16 @@ public class SpecializationsService : ISpecializationsService
     {
         var specialization = _mapper.Map<Specialization>(newSpecialization);
 
-/*        var specialization = new Specialization()
-        {
-            Name = newSpecialization.Name,
-            Status = (Status)newSpecialization.Status
-        };*/
-
-        await _specializationRepository.CreateAsync(specialization);
+        await _specializationsRepository.CreateAsync(specialization);
 
         var specializationResult = _mapper.Map<SpecializationResponseDTO>(specialization);
-
-        /*var specializationResult = new SpecializationResponseDTO()
-        {
-            Id = specialization.Id,
-            Name = specialization.Name,
-            Status = (int)specialization.Status
-        };*/
 
         return specializationResult;
     }
 
     public async Task<OneOf<Success, NotFound>> UpdateSpecializationAsync(int id, SpecializationUpdateDTO editedSpecialization)
     {
-        var specializationEntity = await _specializationRepository.GetByIdAsync(id);
+        var specializationEntity = await _specializationsRepository.GetByIdAsync(id);
 
         if (specializationEntity is null)
         {
@@ -82,7 +69,7 @@ public class SpecializationsService : ISpecializationsService
 
         _mapper.Map(editedSpecialization, specializationEntity);
 
-        await _specializationRepository.UpdateAsync(specializationEntity);
+        await _specializationsRepository.UpdateAsync(specializationEntity);
 
         return new Success();
     }

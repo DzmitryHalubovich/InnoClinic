@@ -9,4 +9,6 @@ public class ServiceCreateDTO
     public int Status { get; set; }
 
     public int ServiceCategoryId { get; set; }
+
+    public int SpecializationId { get; set; }
 }

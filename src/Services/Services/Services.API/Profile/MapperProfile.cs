@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Services.Contracts.Service;
 using Services.Contracts.Specialization;
 using Services.Domain.Entities;
 
@@ -11,5 +12,11 @@ public class MapperProfile : Profile
         CreateMap<Specialization, SpecializationResponseDTO>();
 
         CreateMap<SpecializationUpdateDTO, Specialization>();
+
+        CreateMap<ServiceCreateDTO, Service>();
+
+        CreateMap<Service, ServiceResponseDTO>();
+
+        CreateMap<ServiceCategory, ServiceCategoryDTO>();
     }
 }

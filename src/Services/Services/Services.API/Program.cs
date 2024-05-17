@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Services.Contracts.Service;
 using Services.Contracts.Specialization;
 using Services.Domain.Interfaces;
 using Services.Infrastructure.Data;
@@ -34,8 +35,12 @@ void ConfigureServices(IServiceCollection services)
     services.AddAutoMapper(typeof(MapperProfile));
     services.AddScoped<IValidator<SpecializationCreateDTO>, SpecializationCreateValidator>();
     services.AddScoped<IValidator<SpecializationUpdateDTO>, SpecializationUpdateValidator>();
-    services.AddScoped<ISpecializationsService, SpecializationsService>();
+    services.AddScoped<IValidator<ServiceCreateDTO>, ServiceCreateValidator>();
+    services.AddScoped<IServicesRepository, ServicesRepository>();
     services.AddScoped<ISpecializationsRepository, SpecializationsRepository>();
+    services.AddScoped<IServiceCategoryRepository, ServiceCategoryRepository>();
+    services.AddScoped<IServicesService, ServicesService>();
+    services.AddScoped<ISpecializationsService, SpecializationsService>();
     services.AddDbContext<ServicesDbContext>(opt =>
         opt.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
     services.AddControllers();

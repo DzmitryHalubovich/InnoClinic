@@ -9,17 +9,17 @@ namespace Services.Presentation.Controllers;
 [Route("api/specializations")]
 public class SpecializationsController : ControllerBase
 {
-    private readonly ISpecializationsService _specializationService;
+    private readonly ISpecializationsService _specializationsService;
 
     public SpecializationsController(ISpecializationsService specializationsService)
     {
-        _specializationService = specializationsService;
+        _specializationsService = specializationsService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetSpecializations()
     {
-        var getSpecializationResponse = await _specializationService.GetAllSpecializationsAsync();
+        var getSpecializationResponse = await _specializationsService.GetAllSpecializationsAsync();
 
         return getSpecializationResponse.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -27,7 +27,7 @@ public class SpecializationsController : ControllerBase
     [HttpGet("{id}", Name = "GetSpecializationById")]
     public async Task<IActionResult> GetSpecializationById([FromRoute] int id)
     {
-        var getSpecializationResponse = await _specializationService.GetSpecializationByIdAsync(id);
+        var getSpecializationResponse = await _specializationsService.GetSpecializationByIdAsync(id);
 
         return getSpecializationResponse.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -40,7 +40,7 @@ public class SpecializationsController : ControllerBase
 
         if(validationResult.IsValid)
         {
-            var specResponse = await _specializationService.CreateSpecializationAsync(newSpecialization);
+            var specResponse = await _specializationsService.CreateSpecializationAsync(newSpecialization);
 
             return CreatedAtRoute("GetSpecializationById", new { id = specResponse.Id },specResponse);
         }
@@ -57,7 +57,7 @@ public class SpecializationsController : ControllerBase
         if (validationResult.IsValid)
         {
             var updateSpecializationResult = 
-                await _specializationService.UpdateSpecializationAsync(id, editedSpecialization);
+                await _specializationsService.UpdateSpecializationAsync(id, editedSpecialization);
 
             return updateSpecializationResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
         }
