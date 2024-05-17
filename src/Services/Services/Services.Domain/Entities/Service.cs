@@ -16,7 +16,6 @@ public class Service
 
     public Status Status { get; set; }
 
-
     public int ServiceCategoryId { get; set; }
 
     public ServiceCategory ServiceCategory { get; set; }

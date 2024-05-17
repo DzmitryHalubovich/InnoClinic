@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Services.Contracts.Service;
+﻿namespace Services.Contracts.Service;
 
 public class ServiceCategoryDTO
 {

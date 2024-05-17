@@ -1,5 +1,4 @@
 ﻿using Services.Contracts.Specialization;
-using System.ComponentModel.DataAnnotations;
 
 namespace Services.Contracts.Service;
 
