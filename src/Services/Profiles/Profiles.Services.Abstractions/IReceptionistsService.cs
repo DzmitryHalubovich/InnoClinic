@@ -6,9 +6,9 @@ namespace Profiles.Services.Abstractions;
 
 public interface IReceptionistsService
 {
-    public Task<OneOf<List<ReceptionistResponseDTO>, NotFound>> GetAllReceptionistsAsync(bool trackChanges);
+    public Task<OneOf<List<ReceptionistResponseDTO>, NotFound>> GetAllReceptionistsAsync();
 
-    public Task<OneOf<ReceptionistResponseDTO, NotFound>> GetReceptionistByIdAsync(Guid id, bool trackChanges);
+    public Task<OneOf<ReceptionistResponseDTO, NotFound>> GetReceptionistByIdAsync(Guid id);
 
     public Task<ReceptionistResponseDTO> CreateReceptionistAsync(ReceptionistCreateDTO newReceptionist);
 

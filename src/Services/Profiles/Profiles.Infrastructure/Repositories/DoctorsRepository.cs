@@ -12,23 +12,16 @@ public class DoctorsRepository : IDoctorsRepository
     public DoctorsRepository(ProfilesDbContext context) => 
         _context = context;
 
-    public async Task<List<Doctor>> GetAllAsync(DoctorsQueryParameters queryParameters, bool trackChanges) => !trackChanges
-        ? await _context.Doctors.AsNoTracking()
-                                .FilterDoctorsBySpecialization(queryParameters.SpecializationId)
-                                .Search(queryParameters.SearchFullName)
-                                .Include(d => d.Account)
-                                .ToListAsync()
-        : await _context.Doctors.FilterDoctorsBySpecialization(queryParameters.SpecializationId)
-                                .Search(queryParameters.SearchFullName)
-                                .Include(d => d.Account)
-                                .ToListAsync();
+    public async Task<List<Doctor>> GetAllAsync(DoctorsQueryParameters queryParameters) =>
+        await _context.Doctors.AsNoTracking()
+            .FilterDoctorsBySpecialization(queryParameters.SpecializationId)
+            .Search(queryParameters.SearchFullName)
+            .Include(d => d.Account)
+            .ToListAsync();
 
-    public async Task<Doctor?> GetByIdAsync(Guid id, bool trackChanges) => !trackChanges
-        ? await _context.Doctors.AsNoTracking()
-                                .Include(d => d.Account)
-                                .FirstOrDefaultAsync(d => d.Id.Equals(id))
-        : await _context.Doctors.Include(d => d.Account)
-                                .FirstOrDefaultAsync(d => d.Id.Equals(id));
+    public async Task<Doctor?> GetByIdAsync(Guid id) =>
+        await _context.Doctors.AsNoTracking().Include(d => d.Account)
+            .FirstOrDefaultAsync(d => d.Id.Equals(id));
 
     public async Task CreateAsync(Doctor doctor)
     {

@@ -7,9 +7,9 @@ namespace Profiles.Services.Abstractions;
 
 public interface IPatientsService
 {
-    public Task<OneOf<List<PatientResponseDTO>, NotFound>> GetAllPatientsAsync(PatientsQueryParameters queryParameters, bool trackCahanges);
+    public Task<OneOf<List<PatientResponseDTO>, NotFound>> GetAllPatientsAsync(PatientsQueryParameters queryParameters);
 
-    public Task<OneOf<PatientResponseDTO, NotFound>> GetPatientByIdAsync(Guid id, bool trackChanges);
+    public Task<OneOf<PatientResponseDTO, NotFound>> GetPatientByIdAsync(Guid id);
 
     public Task<PatientResponseDTO> CreatePatientAsync(PatientCreateDTO newPatient);
 

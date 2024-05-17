@@ -27,7 +27,7 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllReceptionists()
     {
-        var getReceptionistsResult = await _receptionistsService.GetAllReceptionistsAsync(false);
+        var getReceptionistsResult = await _receptionistsService.GetAllReceptionistsAsync();
 
         return getReceptionistsResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -45,7 +45,7 @@ public class ReceptionistsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var getReceptionistResult = await _receptionistsService.GetReceptionistByIdAsync(id, false);
+        var getReceptionistResult = await _receptionistsService.GetReceptionistByIdAsync(id);
 
         return getReceptionistResult.Match<IActionResult>(Ok, notFound => NotFound());
     }

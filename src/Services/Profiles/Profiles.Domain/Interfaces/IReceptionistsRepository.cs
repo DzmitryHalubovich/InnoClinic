@@ -4,9 +4,9 @@ namespace Profiles.Domain.Interfaces;
 
 public interface IReceptionistsRepository
 {
-    public Task<List<Receptionist>> GetAllAsync(bool trackChanges);
+    public Task<List<Receptionist>> GetAllAsync();
 
-    public Task<Receptionist?> GetByIdAsync(Guid id, bool trackChanges);
+    public Task<Receptionist?> GetByIdAsync(Guid id);
 
     public Task CreateAsync(Receptionist receptionist);
 

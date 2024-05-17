@@ -24,9 +24,9 @@ public class PatientsService : IPatientsService
         _mapper = mapper;
     }
 
-    public async Task<OneOf<List<PatientResponseDTO>, NotFound>> GetAllPatientsAsync(PatientsQueryParameters queryParameters, bool trackCahanges)
+    public async Task<OneOf<List<PatientResponseDTO>, NotFound>> GetAllPatientsAsync(PatientsQueryParameters queryParameters)
     {
-        var patients = await _patientsRepository.GetAllAsync(queryParameters, trackCahanges);
+        var patients = await _patientsRepository.GetAllAsync(queryParameters);
 
         if (patients.IsNullOrEmpty())
         {
@@ -38,9 +38,9 @@ public class PatientsService : IPatientsService
         return mappedPatients;
     }
 
-    public async Task<OneOf<PatientResponseDTO, NotFound>> GetPatientByIdAsync(Guid id, bool trackChanges)
+    public async Task<OneOf<PatientResponseDTO, NotFound>> GetPatientByIdAsync(Guid id)
     {
-        var patient = await _patientsRepository.GetByIdAsync(id, trackChanges);
+        var patient = await _patientsRepository.GetByIdAsync(id);
 
         if (patient is null)
         {
@@ -72,7 +72,7 @@ public class PatientsService : IPatientsService
 
     public async Task<OneOf<Success, NotFound>> UpdatePatientAsync(Guid id, PatientUpdateDTO updatedPatient)
     {
-        var patientEntity = await _patientsRepository.GetByIdAsync(id, false);
+        var patientEntity = await _patientsRepository.GetByIdAsync(id);
 
         if (patientEntity is null)
         {
@@ -88,7 +88,7 @@ public class PatientsService : IPatientsService
 
     public async Task<OneOf<Success, NotFound>> DeletePatientAsync(Guid id)
     {
-        var patientEntity = await _patientsRepository.GetByIdAsync(id, false);
+        var patientEntity = await _patientsRepository.GetByIdAsync(id);
 
         if (patientEntity is null)
         {

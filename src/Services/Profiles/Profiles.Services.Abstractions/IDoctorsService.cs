@@ -7,9 +7,9 @@ namespace Profiles.Services.Abstractions;
 
 public interface IDoctorsService
 {
-    public Task<OneOf<List<DoctorResponseDTO>, NotFound>> GetAllDoctorsAsync(DoctorsQueryParameters queryParameters, bool trackChanges);
+    public Task<OneOf<List<DoctorResponseDTO>, NotFound>> GetAllDoctorsAsync(DoctorsQueryParameters queryParameters);
 
-    public Task<OneOf<DoctorResponseDTO, NotFound>> GetDoctorByIdAsync(Guid id, bool trackChanges);
+    public Task<OneOf<DoctorResponseDTO, NotFound>> GetDoctorByIdAsync(Guid id);
 
     public Task<DoctorResponseDTO> CreateDoctorAsync(DoctorCreateDTO newDoctor);
     

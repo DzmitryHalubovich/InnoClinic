@@ -5,9 +5,9 @@ namespace Profiles.Domain.Interfaces;
 
 public interface IPatientsRepository
 {
-    public Task<List<Patient>> GetAllAsync(PatientsQueryParameters queryParameters, bool trackChanges);
+    public Task<List<Patient>> GetAllAsync(PatientsQueryParameters queryParameters);
 
-    public Task<Patient?> GetByIdAsync(Guid id, bool trackChanges);
+    public Task<Patient?> GetByIdAsync(Guid id);
 
     public Task CreateAsync(Patient patient);
 

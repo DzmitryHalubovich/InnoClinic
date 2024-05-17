@@ -28,7 +28,7 @@ public class PatientsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllPatients([FromQuery] PatientsQueryParameters queryParameters)
     {
-        var getPatientsResult = await _patientsService.GetAllPatientsAsync(queryParameters, false);
+        var getPatientsResult = await _patientsService.GetAllPatientsAsync(queryParameters);
 
         return getPatientsResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
@@ -45,7 +45,7 @@ public class PatientsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPatientById(Guid id)
     {
-        var getPatientResult = await _patientsService.GetPatientByIdAsync(id, false);
+        var getPatientResult = await _patientsService.GetPatientByIdAsync(id);
 
         return getPatientResult.Match<IActionResult>(Ok, notFound => NotFound());
     }

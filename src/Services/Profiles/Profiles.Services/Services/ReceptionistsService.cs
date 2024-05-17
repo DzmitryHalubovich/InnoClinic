@@ -24,12 +24,11 @@ public class ReceptionistsService : IReceptionistsService
         _mapper = mapper;
         _httpRepository = httpRepository;
         _accountsRepository = accountsRepository;
-
     }
 
-    public async Task<OneOf<List<ReceptionistResponseDTO>, NotFound>> GetAllReceptionistsAsync(bool trackChanges)
+    public async Task<OneOf<List<ReceptionistResponseDTO>, NotFound>> GetAllReceptionistsAsync()
     {
-        var receptionists = await _receptionistsRepository.GetAllAsync(trackChanges);
+        var receptionists = await _receptionistsRepository.GetAllAsync();
 
         if (receptionists.IsNullOrEmpty())
         {
@@ -50,9 +49,9 @@ public class ReceptionistsService : IReceptionistsService
         return mappedReceptionists;
     }
 
-    public async Task<OneOf<ReceptionistResponseDTO, NotFound>> GetReceptionistByIdAsync(Guid id, bool trackChanges)
+    public async Task<OneOf<ReceptionistResponseDTO, NotFound>> GetReceptionistByIdAsync(Guid id)
     {
-        var receptionist = await _receptionistsRepository.GetByIdAsync(id, trackChanges);
+        var receptionist = await _receptionistsRepository.GetByIdAsync(id);
 
         if (receptionist is null)
         {
@@ -90,7 +89,7 @@ public class ReceptionistsService : IReceptionistsService
 
     public async Task<OneOf<Success, NotFound>> UpdateReceptionistAsync(Guid id, ReceptionistUpdateDTO updatedReceptionist)
     {
-        var receptionistEntity = await _receptionistsRepository.GetByIdAsync(id, false);
+        var receptionistEntity = await _receptionistsRepository.GetByIdAsync(id);
 
         if (receptionistEntity is null)
         {
@@ -106,7 +105,7 @@ public class ReceptionistsService : IReceptionistsService
 
     public async Task<OneOf<Success, NotFound>> DeleteReceptionistAsync(Guid id)
     {
-        var receptionistEntity = await _receptionistsRepository.GetByIdAsync(id, false);
+        var receptionistEntity = await _receptionistsRepository.GetByIdAsync(id);
 
         if (receptionistEntity is null)
         {

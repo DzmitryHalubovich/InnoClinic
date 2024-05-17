@@ -12,19 +12,13 @@ public class ReceptionistsRepository : IReceptionistsRepository
     public ReceptionistsRepository(ProfilesDbContext context) => 
         _context = context;
 
-    public async Task<List<Receptionist>> GetAllAsync(bool trackChanges) => !trackChanges
-        ? await _context.Receptionists.AsNoTracking()
-                                      .Include(r => r.Account)
-                                      .ToListAsync()
-        : await _context.Receptionists.Include(r => r.Account)
-                                      .ToListAsync();
+    public async Task<List<Receptionist>> GetAllAsync() =>
+        await _context.Receptionists.AsNoTracking()
+            .Include(r => r.Account).ToListAsync();
 
-    public async Task<Receptionist?> GetByIdAsync(Guid receptionistId, bool trackChanges) => !trackChanges
-        ? await _context.Receptionists.AsNoTracking()
-                                      .Include(r => r.Account)
-                                      .FirstOrDefaultAsync(r => r.Id.Equals(receptionistId))
-        : await _context.Receptionists.Include(r => r.Account)
-                                      .FirstOrDefaultAsync(r => r.Id.Equals(receptionistId));
+    public async Task<Receptionist?> GetByIdAsync(Guid receptionistId) =>
+        await _context.Receptionists.AsNoTracking().Include(r => r.Account)
+            .FirstOrDefaultAsync(r => r.Id.Equals(receptionistId));
 
     public async Task CreateAsync(Receptionist newReceptionist)
     {
