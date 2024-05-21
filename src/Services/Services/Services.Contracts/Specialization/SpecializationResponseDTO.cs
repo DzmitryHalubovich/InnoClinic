@@ -1,4 +1,6 @@
-﻿namespace Services.Contracts.Specialization;
+﻿using Services.Contracts.Service;
+
+namespace Services.Contracts.Specialization;
 
 public class SpecializationResponseDTO
 {
@@ -7,4 +9,6 @@ public class SpecializationResponseDTO
     public string Name { get; set; }
 
     public int Status { get; set; }
+
+    public IEnumerable<ServiceResponseDTO>? Services { get; set; }
 }

@@ -20,7 +20,10 @@ public class Service
 
     public ServiceCategory ServiceCategory { get; set; }
 
+    [Required]
+    [ForeignKey(nameof(Specialization))]
     public int SpecializationId { get; set; }
 
+    [NotMapped]
     public Specialization Specialization { get; set; }
 }

@@ -11,4 +11,6 @@ public interface IServicesRepository
     public Task CreateAsync(Service service);
 
     public Task UpdateAsync(Service service);
+
+    public Task DeleteAsync(Service service);
 }

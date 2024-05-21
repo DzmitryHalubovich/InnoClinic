@@ -75,10 +75,22 @@ public class ServicesService : IServicesService
 
         var serviceResponse = _mapper.Map<ServiceResponseDTO>(service);
 
-        serviceResponse.Specialization = _mapper.Map<SpecializationResponseDTO>(specialization);
-
         serviceResponse.ServiceCategory = _mapper.Map<ServiceCategoryDTO>(serviceCategory);
 
         return serviceResponse;
+    }
+
+    public async Task<OneOf<Success, NotFound>> DeleteServiceAsync(Guid id)
+    {
+        var serviceEntity = await _servicesRepository.GetByIdAsync(id);
+
+        if (serviceEntity is null)
+        {
+            return new NotFound();
+        }
+
+        await _servicesRepository.DeleteAsync(serviceEntity);
+
+        return new Success();
     }
 }

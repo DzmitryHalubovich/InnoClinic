@@ -11,4 +11,6 @@ public interface IServicesService
     public Task<OneOf<ServiceResponseDTO, NotFound>> GetServiceByIdAsync(Guid id);
 
     public Task<OneOf<ServiceResponseDTO, NotFound>> CreateServiceAsync(ServiceCreateDTO newService);
+
+    public Task<OneOf<Success, NotFound>> DeleteServiceAsync(Guid id);
 }

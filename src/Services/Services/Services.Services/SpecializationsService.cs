@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using OneOf;
 using OneOf.Types;
+using Services.Contracts.Filtering;
 using Services.Contracts.Specialization;
 using Services.Domain.Entities;
 using Services.Domain.Interfaces;
@@ -19,9 +20,10 @@ public class SpecializationsService : ISpecializationsService
         _mapper = mapper;
     }
 
-    public async Task<OneOf<List<SpecializationResponseDTO>, NotFound>> GetAllSpecializationsAsync()
+    public async Task<OneOf<List<SpecializationResponseDTO>, NotFound>> GetAllSpecializationsAsync(
+        SpecializationsQueryParameters queryParameters)
     {
-        var specializationsList = await _specializationsRepository.GetAllAsync();
+        var specializationsList = await _specializationsRepository.GetAllAsync(queryParameters);
 
         if (!specializationsList.Any())
         {
@@ -47,6 +49,32 @@ public class SpecializationsService : ISpecializationsService
         return mappedSpecialization;
     }
 
+    public async Task<OneOf<Success, NotFound>> ChangeSpecializationStatusAsync(int id, 
+        SpecializationUpdateDTO editedSpecialization)
+    {
+        var specializationEntity = await _specializationsRepository.GetByIdAsync(id);
+        var statusIsChangedToInactive = false;
+
+        if (specializationEntity is null)
+        {
+            return new NotFound();
+        }
+
+        if (editedSpecialization.Status.Equals(Status.Inactive))
+        {
+            statusIsChangedToInactive = true;
+            specializationEntity.Status = (Status)editedSpecialization.Status;
+        }
+        else
+        {
+            _mapper.Map(editedSpecialization, specializationEntity);
+        }
+
+        await _specializationsRepository.UpdateStatusAsync(specializationEntity, statusIsChangedToInactive);
+
+        return new Success();
+    }
+
     public async Task<SpecializationResponseDTO> CreateSpecializationAsync(SpecializationCreateDTO newSpecialization)
     {
         var specialization = _mapper.Map<Specialization>(newSpecialization);
@@ -70,6 +98,20 @@ public class SpecializationsService : ISpecializationsService
         _mapper.Map(editedSpecialization, specializationEntity);
 
         await _specializationsRepository.UpdateAsync(specializationEntity);
+
+        return new Success();
+    }
+
+    public async Task<OneOf<Success, NotFound>> DeleteSpecializationAsync(int id)
+    {
+        var specializationEntity = await _specializationsRepository.GetByIdAsync(id);
+
+        if (specializationEntity is null)
+        {
+            return new NotFound();
+        }
+
+        await _specializationsRepository.DeleteAsync(specializationEntity);
 
         return new Success();
     }

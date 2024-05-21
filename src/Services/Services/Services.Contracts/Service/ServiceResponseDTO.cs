@@ -12,8 +12,5 @@ public class ServiceResponseDTO
 
     public int Status { get; set; }
 
-
     public ServiceCategoryDTO ServiceCategory { get; set; }
-
-    public SpecializationResponseDTO Specialization { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Services.Domain.Entities;
 
@@ -11,4 +13,6 @@ public class Specialization
     public string Name { get; set; } = null!;
 
     public Status Status { get; set; }
+
+    public ICollection<Service>? Services { get; set; }
 }

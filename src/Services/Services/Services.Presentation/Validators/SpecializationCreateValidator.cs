@@ -11,5 +11,8 @@ public class SpecializationCreateValidator : AbstractValidator<SpecializationCre
             .NotNull()
             .NotEmpty()
             .MaximumLength(100);
+
+        RuleForEach(x => x.Services)
+            .SetValidator(new ServiceCreateValidator());
     }
 }

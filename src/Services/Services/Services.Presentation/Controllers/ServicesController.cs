@@ -47,4 +47,12 @@ public class ServicesController : ControllerBase
 
         return BadRequest(validationResult.ToDictionary());
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteService([FromRoute] Guid id)
+    {
+        var deleteServiceResult = await _servicesService.DeleteServiceAsync(id);
+
+        return deleteServiceResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
+    }
 }
