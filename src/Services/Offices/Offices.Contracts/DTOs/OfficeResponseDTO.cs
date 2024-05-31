@@ -1,4 +1,4 @@
 ﻿namespace Offices.Contracts.DTOs;
 
-public record OfficeResponseDTO(string Id, string Address, 
+public record OfficeResponseDTO(string OfficeId, string Address, 
     string PhotoId, string RegistryPhoneNumber, bool IsActive);

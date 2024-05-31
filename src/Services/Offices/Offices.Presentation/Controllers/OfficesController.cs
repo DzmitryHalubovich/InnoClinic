@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Offices.Contracts.DTOs;
+using Offices.Presentation.ModelBinders;
 using Offices.Services.Abstractions;
+using OneOf.Types;
 
 namespace Offices.Presentation.Controllers;
 
@@ -15,11 +17,8 @@ public class OfficesController : ControllerBase
 {
     private readonly IOfficesService _officesService;
 
-    public OfficesController(IOfficesService officesService)
-    {
+    public OfficesController(IOfficesService officesService) =>
         _officesService = officesService;
-    }
-
 
     /// <summary>
     /// Returns list of offices
@@ -56,16 +55,52 @@ public class OfficesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAllOffices()
     {
-        var offices = await _officesService.GetAllOfficesAsync();
+        var getAllOfficesResult = await _officesService.GetAllOfficesAsync();
 
-        if (!offices.Any())
-        {
-            return NotFound();
-        }
-
-        return Ok(offices);
+        return getAllOfficesResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
 
+    /// <summary>
+    /// Returns list of offices by the specified ids
+    /// </summary>
+    /// <remarks>
+    /// Sample request:
+    /// 
+    ///     GET /GetOfficesByIds
+    ///     [
+    ///         {
+    ///             "id": "6628bfbfb2cf06aabe117b7d",
+    ///             "address": "Some address1",
+    ///             "photoId": "6628bfbfb2cf06aabe117b7d",
+    ///             "registryPhoneNumber": "+123456785894",
+    ///             "isActive": true
+    ///         },
+    ///         {
+    ///             "id": "6638bfbfb4cf06acbe118b7w",
+    ///             "address": "Some address2",
+    ///             "photoId": "6628bfbma2cf34aabe117b7d",
+    ///             "registryPhoneNumber": "+987654321214",
+    ///             "isActive": false
+    ///         },
+    ///         ...
+    ///     ]
+    /// 
+    /// </remarks>
+    /// <param name="officesIds">Ids of offices</param>
+    /// <returns></returns>
+    /// <response code="200">Returns offices successfully</response>
+    /// <response code="404">Returns if there aren't any offices in the database</response>
+    [HttpGet("collection/({officesIds})")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetOfficesByIds(
+        [ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<string> officesIds)
+    {
+        var getOfficesResult = await _officesService.GetOfficesByIdsAsync(officesIds);
+
+        return getOfficesResult.Match<IActionResult>(Ok, notFound => NotFound());
+    }
 
     /// <summary>
     /// Returns office by the specified id
@@ -93,11 +128,10 @@ public class OfficesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOfficeById([FromRoute] string officeId)
     {
-        var office = await _officesService.GetOfficeByIdAsync(officeId);
+        var getOfficeResult = await _officesService.GetOfficeByIdAsync(officeId);
 
-        return Ok(office);
+        return getOfficeResult.Match<IActionResult>(Ok, notFound => NotFound());
     }
-
 
     /// <summary>
     /// Add new office to the database
@@ -131,12 +165,11 @@ public class OfficesController : ControllerBase
         {
             var createdOffice = await _officesService.AddNewOfficeAsync(newOffice);
 
-            return CreatedAtRoute("GetOfficeById",  new { officeId = createdOffice.Id }, createdOffice);
+            return CreatedAtRoute("GetOfficeById",  new { officeId = createdOffice.OfficeId }, createdOffice);
         }
 
-        return BadRequest(validationResult);
+        return BadRequest(validationResult.ToDictionary());
     }
-
 
     /// <summary>
     /// Deletes the office by the specified id
@@ -159,11 +192,10 @@ public class OfficesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteOfficeById([FromRoute] string officeId)
     {
-        await _officesService.DeleteOfficeAsync(officeId);
+        var deleteOfficeResult = await _officesService.DeleteOfficeAsync(officeId);
 
-        return NoContent();
+        return deleteOfficeResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
     }
-
 
     /// <summary>
     /// Update office by the specified id
@@ -199,9 +231,9 @@ public class OfficesController : ControllerBase
 
         if (validationResult.IsValid)
         {
-            await _officesService.UpdateOfficeAsync(officeId, editedOffice);
+            var updateOfficeResult = await _officesService.UpdateOfficeAsync(officeId, editedOffice);
 
-            return NoContent();
+            return updateOfficeResult.Match<IActionResult>(success => NoContent(), notFound => NotFound());
         }
 
         return BadRequest(validationResult.ToDictionary());

@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using Offices.Contracts.DTOs;
 using Offices.Domain.Entities;
-using Offices.Domain.Exceptions;
 using Offices.Domain.Interfaces;
 using Offices.Services.Abstractions;
+using OneOf;
+using OneOf.Types;
 
 namespace Offices.Services.Services;
 
@@ -18,20 +19,42 @@ public class OfficesService : IOfficesService
         _mapper = mapper;
     }
 
-    public async Task<List<OfficeResponseDTO>> GetAllOfficesAsync()
+    public async Task<OneOf<List<OfficeResponseDTO>, NotFound>> GetAllOfficesAsync()
     {
         var offices = await _officesRepository.GetAllAsync();
+
+        if (!offices.Any())
+        {
+            return new NotFound();
+        }
 
         var mappedOfficesCollection = _mapper.Map<List<OfficeResponseDTO>>(offices);
 
         return mappedOfficesCollection;
     }
 
-    public async Task<OfficeResponseDTO> GetOfficeByIdAsync(string officeId)
+    public async Task<OneOf<List<OfficeResponseDTO>, NotFound>> GetOfficesByIdsAsync(IEnumerable<string> officesIds)
     {
-        await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);
+        var offices = await _officesRepository.GetCollectionByIdsAsync(officesIds);
 
+        if (!offices.Any())
+        {
+            return new NotFound();
+        }
+
+        var mappedOfficesCollection = _mapper.Map<List<OfficeResponseDTO>>(offices);
+
+        return mappedOfficesCollection;
+    }
+
+    public async Task<OneOf<OfficeResponseDTO, NotFound>> GetOfficeByIdAsync(string officeId)
+    {
         var office = await _officesRepository.GetByIdAsync(officeId);
+
+        if (office is null)
+        {
+            return new NotFound();
+        }
 
         var mappedOffice = _mapper.Map<OfficeResponseDTO>(office);
 
@@ -49,32 +72,33 @@ public class OfficesService : IOfficesService
         return createdOffice;
     }
 
-    public async Task DeleteOfficeAsync(string officeId)
+    public async Task<OneOf<Success, NotFound>> DeleteOfficeAsync(string officeId)
     {
-        await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);
+        var office = await _officesRepository.GetByIdAsync(officeId);
+
+        if (office is null)
+        {
+            return new NotFound();
+        }
 
         await _officesRepository.DeleteAsync(officeId);
+
+        return new Success();
     }
 
-    public async Task UpdateOfficeAsync(string officeId, OfficeUpdateDTO updatedOffice)
+    public async Task<OneOf<Success, NotFound>> UpdateOfficeAsync(string officeId, OfficeUpdateDTO updatedOffice)
     {
-        await ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(officeId);
+        var office = await _officesRepository.GetByIdAsync(officeId);
 
-        var office = _mapper.Map<Office>(updatedOffice);
+        if (office is null)
+        {
+            return new NotFound();
+        }
 
-        office.Id = officeId;
+        office = _mapper.Map<Office>(updatedOffice);
 
         await _officesRepository.UpdateAsync(officeId, office);
-    }
 
-
-    private async Task ThrowNotFoundExceptionIfOfficeDoesntExistInDatabase(string officeId)
-    {
-        var doesOfficeExists = await _officesRepository.GetByIdAsync(officeId) is not null;
-
-        if (!doesOfficeExists)
-        {
-            throw new NotFoundException($"Office with id: {officeId} does't exist in the database.");
-        }
+        return new Success();
     }
 }

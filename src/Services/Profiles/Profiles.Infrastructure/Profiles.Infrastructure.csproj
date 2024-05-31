@@ -7,11 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OneOf" Version="3.0.263" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Offices.Contracts\Offices.Contracts.csproj" />
+    <ProjectReference Include="..\Profiles.Domain\Profiles.Domain.csproj" />
   </ItemGroup>
 
 </Project>
