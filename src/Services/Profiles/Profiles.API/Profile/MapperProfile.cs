@@ -9,6 +9,7 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         #region Doctor
+
         CreateMap<Doctor, DoctorResponseDTO>()
             .ForPath(dest => dest.Office.OfficeId, opt => opt.MapFrom(src => src.OfficeId))
             .ForMember(dest => dest.Experience, 
@@ -22,6 +23,7 @@ public class MapperProfile : Profile
         #endregion
 
         #region Patient
+
         CreateMap<PatientCreateDTO, Patient>();
         CreateMap<Patient, PatientResponseDTO>()
             .ForPath(dest => dest.PhoneNumber, 
@@ -30,15 +32,18 @@ public class MapperProfile : Profile
         CreateMap<PatientUpdateDTO, Patient>()
             .ForPath(dest => dest.Account.PhoneNumber,
             opt => opt.MapFrom(src => src.PhoneNumber));
+
         #endregion
 
         #region Receptionist
+
         CreateMap<ReceptionistCreateDTO, Receptionist>();
 
         CreateMap<Receptionist, ReceptionistResponseDTO>()
             .ForPath(dest => dest.Office.OfficeId, opt => opt.MapFrom(src => src.OfficeId));
 
         CreateMap<ReceptionistUpdateDTO, Receptionist>();
+
         #endregion
     }
 }

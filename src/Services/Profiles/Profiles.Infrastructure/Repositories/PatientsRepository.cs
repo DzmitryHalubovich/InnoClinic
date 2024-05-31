@@ -16,6 +16,7 @@ public class PatientsRepository : IPatientsRepository
     public async Task<List<Patient>> GetAllAsync(PatientsQueryParameters queryParameters) =>
         await _context.Patients.AsNoTracking().Search(queryParameters.SearchFullName)
             .Include(p => p.Account).ToListAsync();
+
     public async Task<Patient?> GetByIdAsync(Guid id) =>
         await _context.Patients.AsNoTracking().Include(p => p.Account)
             .FirstOrDefaultAsync(p => p.Id.Equals(id));

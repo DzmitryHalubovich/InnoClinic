@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Profiles.Domain.ErrorModel;
-using Profiles.Domain.Exceptions;
 
 namespace Profiles.API.Extensions;
 
@@ -20,7 +19,6 @@ public static class ExceptionMiddlewareExtensions
                 {
                     context.Response.StatusCode = contextFeature.Error switch
                     {
-                        NotFoundException => StatusCodes.Status404NotFound,
                         _ => StatusCodes.Status500InternalServerError
                     };
 
